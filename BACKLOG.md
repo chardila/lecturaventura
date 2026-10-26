@@ -36,6 +36,11 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 8. **Resaltado palabra por palabra** (tipo karaoke) para seguir el ritmo del modelo.
 9. Dividir el código en módulos (hoy es un solo archivo grande).
 
+## Voz / audio (descubierto probando en Brave, Ubuntu)
+- Los navegadores en Linux suelen **no exponer voces** del sistema (0 voces, `synthesis-failed`), aunque `speech-dispatcher` y `espeak-ng` estén instalados. El botón "Escuchar" quedaba mudo.
+- Hecho: elige voz por idioma y muestra aviso si no hay voz.
+- Pendiente: para el modo "escucha y repite" **no depender de la voz del navegador**. Opciones: audios pregrabados por el padre/madre (mejor cadencia, voz conocida) o generados con un TTS neuronal y empaquetados.
+
 ## Preguntas abiertas
 - Variante del español para la voz.
 - Cómo hacer que el reconocimiento de voz funcione bien con niños y offline (a investigar).

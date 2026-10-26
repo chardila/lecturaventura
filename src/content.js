@@ -140,6 +140,7 @@ const UI = {
     focusSpelling: "Practiquen ortografía. Aplaudir las sílabas de cada palabra ayuda.",
     focusVocab: "Hablen de las palabras nuevas y usen las tarjetas de palabras.",
     focusGreat: "¡Muy buen rendimiento, equilibrado! Sigan así.",
+    noVoice: "Este navegador no tiene voz para leer en voz alta. Prueba con otro navegador o instala una voz.",
     abc: "A B C"
   },
   en: {
@@ -254,7 +255,8 @@ const UI = {
     focusSpelling: "Practise spelling – clapping words into syllables helps.",
     focusVocab: "Talk about new words – use the vocabulary cards.",
     focusGreat: "Great, balanced performance – keep it up!",
-    abc: "A B C"
+    abc: "A B C",
+    noVoice: "This browser has no voice for reading aloud. Try another browser or install a voice."
   }
 };
 

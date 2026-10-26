@@ -473,6 +473,7 @@ const UI = {
     focusSpelling: "Practiquen ortografía. Aplaudir las sílabas de cada palabra ayuda.",
     focusVocab: "Hablen de las palabras nuevas y usen las tarjetas de palabras.",
     focusGreat: "¡Muy buen rendimiento, equilibrado! Sigan así.",
+    noVoice: "Este navegador no tiene voz para leer en voz alta. Prueba con otro navegador o instala una voz.",
     abc: "A B C"
   },
   en: {
@@ -587,7 +588,8 @@ const UI = {
     focusSpelling: "Practise spelling – clapping words into syllables helps.",
     focusVocab: "Talk about new words – use the vocabulary cards.",
     focusGreat: "Great, balanced performance – keep it up!",
-    abc: "A B C"
+    abc: "A B C",
+    noVoice: "This browser has no voice for reading aloud. Try another browser or install a voice."
   }
 };
 
@@ -3805,14 +3807,26 @@ const CONTENT = {
       o.stop(audioCtx.currentTime + 0.32);
     } catch (e) {}
   }
+  // Elige una voz del navegador que coincida con el idioma (es-CO > es-* > cualquiera es)
+  function pickVoice(langTag) {
+    var voices = window.speechSynthesis.getVoices() || [];
+    var base = langTag.split("-")[0].toLowerCase();
+    var exact = voices.filter(function (v) { return v.lang.replace("_", "-").toLowerCase() === langTag.toLowerCase(); })[0];
+    return exact || voices.filter(function (v) { return v.lang.toLowerCase().indexOf(base) === 0; })[0] || null;
+  }
   function speak(text) {
-    if (!("speechSynthesis" in window)) return;
+    if (!("speechSynthesis" in window)) { toast("\uD83D\uDD07 " + t("noVoice")); return; }
     window.speechSynthesis.cancel();
+    var tag = state.lang === "en" ? "en-GB" : "es-CO";
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = state.lang === "en" ? "en-GB" : "es-CO";
+    var voice = pickVoice(tag);
+    if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = tag;
     u.rate = 0.9;
+    // Sin voces instaladas o fallo del motor: avisar en vez de quedarse en silencio
+    u.onerror = function (e) { if (e.error !== "canceled" && e.error !== "interrupted") toast("\uD83D\uDD07 " + t("noVoice")); };
     window.speechSynthesis.speak(u);
   }
+  if ("speechSynthesis" in window) window.speechSynthesis.getVoices();   // algunos navegadores cargan las voces de forma diferida
   function confetti() {
     if (state.theme === undefined) return;
     var emojis = ["\u2b50","\uD83C\uDF89","\u2728","\uD83E\uDE99","\uD83C\uDF8A"];

@@ -41,6 +41,13 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 - Hecho: elige voz por idioma y muestra aviso si no hay voz.
 - Pendiente: para el modo "escucha y repite" **no depender de la voz del navegador**. Opciones: audios pregrabados por el padre/madre (mejor cadencia, voz conocida) o generados con un TTS neuronal y empaquetados.
 
+## Resultado de la prueba de voz (spike, 2026-10-26)
+- **Brave/Ubuntu (snap):** 0 voces del sistema; botón "Escuchar" mudo.
+- **Tablet Fire (Silk), dispositivo principal de la niña:** el navegador dice soportar reconocimiento y 1 voz en español, pero al escuchar falla (no encuentra el motor de Google) y la lectura en voz alta no suena. **Por web no sirve** para escuchar ni leer en voz alta.
+- **iPad Pro M1 (Safari), respaldo/pruebas del padre:** reconoce voz en español y funciona **sin internet**.
+- Caminos para la Fire: (a) app Android (APK) con Vosk offline; (b) que la niña practique en el iPad; (c) Fire solo con audio pregrabado, sin que la app escuche.
+- Decisión de audio modelo: primero voz neuronal generada y empaquetada, luego grabaciones del padre.
+
 ## Preguntas abiertas
 - Variante del español para la voz.
 - Cómo hacer que el reconocimiento de voz funcione bien con niños y offline (a investigar).

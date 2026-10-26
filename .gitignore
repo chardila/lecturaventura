@@ -1,0 +1,13 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Node (nur falls später Tooling dazukommt)
+node_modules/
+
+# Herramientas locales
+.tldr/
+.tldrignore

@@ -33,7 +33,7 @@ La app ya tiene 15 historias (5 mundos, en español e inglés), con versión fá
 
 ### 2.2 Escucha y comparación
 
-- Reconocimiento de voz del navegador (Web Speech API) en español **es-CO** (inglés **en-US/en-GB** para las historias en inglés), **solo en el iPad/Safari**, que en las pruebas reconoció español y funcionó **sin internet**.
+- Reconocimiento de voz del navegador (Web Speech API) en español **es-CO**, **solo en el iPad/Safari**, que en las pruebas reconoció español y funcionó **sin internet**.
 - Se compara lo reconocido con la frase esperada **palabra por palabra**, ignorando mayúsculas, tildes y signos.
 - **Anti-objetivo clave:** el reconocimiento con voz de niña de 8 años se equivocará. Ante la duda se **acepta** la palabra. Nunca se debe marcar mal a la niña por un error del reconocedor. Los umbrales deben ser **permisivos** y ajustables.
 
@@ -61,6 +61,7 @@ Premios que Carlos pidió: **desbloquear más historias**, y de forma gradual **
 - No funciona en la tablet **Fire** (Silk no tiene motor de reconocimiento; las pruebas lo confirmaron). Ver sección 5.
 - Sin cuentas ni servidor; nada de grabar ni enviar la voz de la niña a ningún lado.
 - No se crea contenido nuevo de historias en esta fase.
+- El modo no se ofrece en inglés (reconocimiento y práctica solo en español).
 - No sustituye el acompañamiento de la psicóloga ni de los padres.
 
 **Anti-metas (se considera fallo aunque técnicamente funcione)**
@@ -76,7 +77,7 @@ Premios que Carlos pidió: **desbloquear más historias**, y de forma gradual **
 - Dispositivo objetivo de la niña en esta fase: **iPad (Safari)**. El iPad Pro M1 de Carlos es el equipo real de pruebas.
 - Se mantiene el estilo del código existente (JS sin frameworks, `src/` + `bash build.sh` genera `index.html`).
 - La voz modelo ("oír la frase" y "decir la palabra") usa **voces del sistema del iPad** en esta fase.
-- Idiomas: español (es-CO) e inglés, ambos con las 15 historias.
+- Idioma del modo nuevo: **solo español (es-CO)** por ahora (decidido por Carlos). La app sigue funcionando en español e inglés; el modo "Práctica en voz alta" no aparece en inglés hasta una fase futura.
 
 ## 5. Decisiones ya tomadas (por Carlos)
 
@@ -86,6 +87,7 @@ Premios que Carlos pidió: **desbloquear más historias**, y de forma gradual **
 - Practicará en el **iPad** por ahora. La Fire queda para más adelante.
 - Audio modelo a futuro: primero voz neuronal generada y empaquetada; luego grabaciones de Carlos.
 - Premios: desbloquear más historias, más largas.
+- Solo en español por ahora.
 - La evaluación de éxito incluye medirla fuera de la app con textos más largos.
 
 ## 6. Qué queda para quien construya
@@ -97,7 +99,7 @@ Premios que Carlos pidió: **desbloquear más historias**, y de forma gradual **
 - Qué hacer si el navegador **no soporta** reconocimiento: mostrar un aviso claro y ofrecer solo el modo "oír la frase".
 - Regla concreta de desbloqueo de historias más largas; cómo ordenar las 15 historias por longitud/dificultad.
 - Cómo guardar el progreso de una sesión pausada y las palabras difíciles (localStorage, como el resto).
-- Textos exactos de retroalimentación positiva, en español e inglés, y cuidar que nunca sean negativos.
+- Textos exactos de retroalimentación positiva, en español, y cuidar que nunca sean negativos.
 - Diseño visual final de la pantalla de práctica (hay un boceto aceptado en la conversación: frase grande, 🎤, palabras iluminadas, mensaje positivo, "Siguiente").
 
 ## 7. Mi criterio (decisiones que tomé yo, para que Carlos las revise)

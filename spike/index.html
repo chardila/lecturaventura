@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prueba de voz (descartable)</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; line-height: 1.4; background: #fffaf0; color: #222; font-size: 18px; }
+  h1 { font-size: 1.3rem; margin: 0 0 4px; }
+  .tag { display: inline-block; background: #ffe08a; padding: 2px 8px; border-radius: 8px; font-size: .8rem; }
+  section { background: #fff; border-radius: 12px; padding: 12px 14px; margin: 14px 0; box-shadow: 0 1px 4px #0002; }
+  button { font-size: 1.1rem; padding: 14px 18px; margin: 6px 6px 6px 0; border-radius: 12px; border: 0; background: #ff7a3c; color: #fff; }
+  button.alt { background: #3aa0ff; }
+  .ok { color: #1a7f37; font-weight: 600; } .no { color: #b3261e; font-weight: 600; }
+  pre, textarea { width: 100%; box-sizing: border-box; background: #f4f4f4; border-radius: 8px; padding: 8px; font-size: .9rem; white-space: pre-wrap; }
+  .big { font-size: 1.4rem; min-height: 2em; }
+  select { font-size: 1rem; padding: 8px; }
+</style>
+</head>
+<body>
+<h1>Prueba de voz <span class="tag">descartable</span></h1>
+<p>Sirve para saber si este dispositivo puede escuchar y leer en voz alta. Al final pulsa «Copiar informe» y pégamelo.</p>
+
+<section>
+  <strong>1. Qué soporta este navegador</strong>
+  <div id="caps"></div>
+</section>
+
+<section>
+  <strong>2. ¿Me escucha?</strong>
+  <p>Idioma: <select id="lang"><option>es-CO</option><option>es-MX</option><option>es-ES</option><option>en-US</option></select></p>
+  <p>Pulsa y di: <em>«La niña lee el cuento despacio»</em></p>
+  <button id="listen">🎤 Escuchar</button>
+  <div class="big" id="heard">—</div>
+  <div id="rec-info"></div>
+</section>
+
+<section>
+  <strong>3. ¿Lee en voz alta?</strong>
+  <button class="alt" id="speak">🔊 Leer una frase</button>
+  <div id="tts-info"></div>
+</section>
+
+<section>
+  <strong>Informe</strong>
+  <textarea id="report" rows="12" readonly></textarea>
+  <button id="copy">Copiar informe</button>
+</section>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var R = { ua: navigator.userAgent, online: navigator.onLine, secure: window.isSecureContext, recognition: {}, tts: {} };
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function row(label, ok, extra) { return '<div>' + label + ': <span class="' + (ok ? 'ok' : 'no') + '">' + (ok ? 'sí' : 'no') + '</span>' + (extra ? ' ' + extra : '') + '</div>'; }
+  function renderCaps() {
+    var voices = ('speechSynthesis' in window) ? speechSynthesis.getVoices() : [];
+    var es = voices.filter(function (v) { return /^es/i.test(v.lang); });
+    R.caps = { speechRecognition: !!SR, speechSynthesis: 'speechSynthesis' in window, voices: voices.length, voicesEs: es.map(function (v) { return v.name + ' (' + v.lang + ')'; }), mic: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) };
+    $('caps').innerHTML =
+      row('Reconocimiento de voz', !!SR) +
+      row('Leer en voz alta', R.caps.speechSynthesis, '(' + voices.length + ' voces, ' + es.length + ' en español)') +
+      row('Micrófono accesible', R.caps.mic) +
+      row('Conexión a internet ahora', navigator.onLine) +
+      row('Página segura (https)', window.isSecureContext) +
+      '<div style="font-size:.8rem;color:#666;word-break:break-all">' + navigator.userAgent + '</div>';
+    update();
+  }
+  function update() { $('report').value = JSON.stringify(R, null, 2); }
+
+  // --- Reconocimiento ---
+  var t0 = 0;
+  $('listen').onclick = function () {
+    if (!SR) { $('rec-info').innerHTML = '<span class="no">Este navegador no tiene reconocimiento de voz.</span>'; R.recognition.unsupported = true; update(); return; }
+    var rec = new SR();
+    rec.lang = $('lang').value; rec.interimResults = true; rec.maxAlternatives = 3; rec.continuous = false;
+    var firstAt = null, events = [];
+    var run = { lang: rec.lang, online: navigator.onLine, events: events };
+    rec.onstart = function () { t0 = performance.now(); events.push('start'); $('heard').textContent = '🎙️ habla ahora…'; };
+    rec.onaudiostart = function () { events.push('audiostart'); };
+    rec.onspeechstart = function () { events.push('speechstart'); };
+    rec.onresult = function (e) {
+      if (firstAt == null) firstAt = Math.round(performance.now() - t0);
+      var r = e.results[e.results.length - 1];
+      $('heard').textContent = r[0].transcript;
+      run.transcript = r[0].transcript; run.confidence = r[0].confidence; run.final = r.isFinal; run.msToFirstResult = firstAt;
+      run.alternatives = Array.prototype.map.call(r, function (a) { return a.transcript; });
+    };
+    rec.onerror = function (e) { events.push('error:' + e.error); run.error = e.error; $('rec-info').innerHTML = '<span class="no">Error: ' + e.error + '</span>'; finish(); };
+    rec.onend = function () { events.push('end'); finish(); };
+    function finish() {
+      if (run.done) return; run.done = true;
+      if (!run.transcript && !run.error) $('heard').textContent = '(no entendí nada)';
+      $('rec-info').innerHTML += '<div>Tiempo hasta el primer texto: ' + (firstAt == null ? '—' : firstAt + ' ms') + (run.confidence != null ? ' · confianza ' + Math.round(run.confidence * 100) + '%' : '') + '</div>';
+      (R.recognition.runs = R.recognition.runs || []).push(run); update();
+    }
+    $('rec-info').innerHTML = '';
+    try { rec.start(); } catch (err) { $('rec-info').innerHTML = '<span class="no">No pudo iniciar: ' + err.message + '</span>'; }
+  };
+
+  // --- Voz ---
+  $('speak').onclick = function () {
+    if (!('speechSynthesis' in window)) { $('tts-info').innerHTML = '<span class="no">Sin síntesis de voz.</span>'; return; }
+    speechSynthesis.cancel();
+    var lang = $('lang').value, voices = speechSynthesis.getVoices();
+    var v = voices.filter(function (x) { return x.lang.replace('_', '-') === lang; })[0] || voices.filter(function (x) { return x.lang.slice(0, 2) === lang.slice(0, 2); })[0];
+    var u = new SpeechSynthesisUtterance('La niña lee el cuento despacio.'); u.lang = lang; if (v) u.voice = v;
+    var started = false, tt = { voiceUsed: v ? v.name + ' (' + v.lang + ')' : 'ninguna' };
+    u.onstart = function () { started = true; }; u.onend = function () { tt.ended = true; show(); };
+    u.onerror = function (e) { tt.error = e.error; show(); };
+    function show() { tt.started = started; R.tts = tt; $('tts-info').innerHTML = 'Voz: ' + tt.voiceUsed + (tt.error ? ' · <span class="no">error ' + tt.error + '</span>' : (started ? ' · <span class="ok">sonó</span>' : '')); update(); }
+    speechSynthesis.speak(u); setTimeout(function () { if (!started && !tt.error) { tt.noStart = true; show(); } }, 2500);
+  };
+
+  $('copy').onclick = function () {
+    var ta = $('report'); ta.select();
+    try { navigator.clipboard.writeText(ta.value); $('copy').textContent = '¡Copiado!'; } catch (e) { document.execCommand('copy'); $('copy').textContent = 'Copiado (o selecciónalo a mano)'; }
+  };
+  window.addEventListener('online', function () { R.online = true; renderCaps(); });
+  window.addEventListener('offline', function () { R.online = false; renderCaps(); });
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = renderCaps;
+  renderCaps();
+})();
+</script>
+</body>
+</html>

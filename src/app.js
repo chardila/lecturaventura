@@ -1018,15 +1018,28 @@
     store.profiles.forEach(function (p) {
       html += '<div class="mission"><span class="big-ic">' + p.avatar + '</span><div style="flex:1">' +
         '<strong>' + esc(p.name) + '</strong> <span class="muted">' + langLabel(p.lang) + ' · ⭐ ' + (p.game.stars || 0) + '</span></div>' +
+        '<div class="btn-row">' +
         '<button class="btn ghost" data-act="parents-edit" data-id="' + esc(p.id) + '">' + t("editProfile") + '</button>' +
-        '</div>';
+        '<button class="btn ghost" data-act="parents-report" data-id="' + esc(p.id) + '">' + t("viewReport") + '</button>' +
+        '<button class="btn ghost" data-act="parents-reset-progress" data-id="' + esc(p.id) + '">' + t("resetProgress") + '</button>' +
+        '<button class="btn ghost" data-act="parents-delete" data-id="' + esc(p.id) + '" style="color:var(--c-red)">' + t("deleteProfile") + '</button>' +
+        '</div></div>';
     });
     html += '<div class="spacer"></div><div class="practice-actions">' +
       (store.profiles.length >= Profiles.MAX_PROFILES
         ? '<p class="muted">' + t("limitReached") + '</p>'
         : '<button class="btn primary" data-act="parents-new">＋ ' + t("newProfile") + '</button>') +
+      (store.profiles.length ? '<button class="btn ghost" data-act="parents-reset-all" style="color:var(--c-red)">' + t("resetAll") + '</button>' : '') +
       '<button class="btn ghost" data-act="parents-exit">' + t("exitParents") + '</button></div></div>';
     parentsScreen(html);
+  }
+
+  // Ejecuta fn con `state` sustituido temporalmente por el del perfil indicado (p. ej. para su informe)
+  function withProfile(id, fn) {
+    var p = Profiles.findProfile(store, id), saved = state;
+    if (!p) return;
+    state = Profiles.toState(p);
+    try { fn(); } finally { state = saved; }
   }
 
   function newDraft() {
@@ -1095,6 +1108,25 @@
       parentDraft = { id: p.id, name: p.name, avatar: p.avatar, lang: p.lang, theme: p.theme,
         readScale: p.readScale, readFont: p.readFont, sound: p.sound };
       renderProfileForm(); return true;
+    }
+    if (act === "parents-report") {
+      var rp = Profiles.findProfile(store, tg.dataset.id);
+      if (rp) withProfile(rp.id, parentSheet);
+      return true;
+    }
+    if (act === "parents-reset-progress" || act === "parents-delete") {
+      var dp = Profiles.findProfile(store, tg.dataset.id);
+      if (!dp) return true;
+      var del = act === "parents-delete";
+      if (confirm(t(del ? "confirmDelete" : "confirmResetProgress").replace("{name}", dp.name))) {
+        if (del) Profiles.deleteProfile(store, dp.id); else Profiles.resetProgress(store, dp.id);
+        persistStore(); renderParentsHome();
+      }
+      return true;
+    }
+    if (act === "parents-reset-all") {
+      if (confirm(t("confirmResetAll"))) { store = Profiles.resetAll(); persistStore(); renderParentsHome(); }
+      return true;
     }
     if (act === "profile-cancel") { parentDraft = null; renderParentsHome(); return true; }
     if (act === "profile-save") { if (parentDraft) saveProfileDraft(); return true; }
@@ -1177,8 +1209,6 @@
       });
     }
 
-    html += '<div class="spacer"></div>' +
-      '<button class="btn ghost" data-act="reset" style="color:var(--c-red)">\uD83D\uDDD1\ufe0f ' + t("resetProfile") + '</button>';
     openSheet(html);
   }
 

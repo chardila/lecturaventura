@@ -413,6 +413,13 @@ const UI = {
     profileCancel: "Cancelar",
     nameRequired: "Escribe un nombre (hasta 20 letras)",
     limitReached: "Ya hay 8 jugadores",
+    viewReport: "Informe",
+    resetProgress: "Borrar progreso",
+    deleteProfile: "Eliminar jugador",
+    resetAll: "Borrar todo",
+    confirmDelete: "¿Eliminar a {name} y todo su progreso?",
+    confirmResetProgress: "¿Borrar el progreso de {name}? Se conservan sus ajustes.",
+    confirmResetAll: "¿Borrar todos los jugadores y todo el progreso? No se puede deshacer.",
     practiceTitle: "Práctica en voz alta",
     practiceIntro: "Lee en voz alta, frase por frase. ¡Yo te escucho!",
     practiceRead: "🎤 Leer",
@@ -571,6 +578,13 @@ const UI = {
     profileCancel: "Cancel",
     nameRequired: "Enter a name (up to 20 letters)",
     limitReached: "There are already 8 players",
+    viewReport: "Report",
+    resetProgress: "Reset progress",
+    deleteProfile: "Delete player",
+    resetAll: "Erase everything",
+    confirmDelete: "Delete {name} and all their progress?",
+    confirmResetProgress: "Reset {name}'s progress? Their settings stay.",
+    confirmResetAll: "Erase all players and all progress? This cannot be undone.",
     chooseStory: "Choose a story",
     minutes: "min",
     readTime: "Reading time",
@@ -4601,15 +4615,28 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
     store.profiles.forEach(function (p) {
       html += '<div class="mission"><span class="big-ic">' + p.avatar + '</span><div style="flex:1">' +
         '<strong>' + esc(p.name) + '</strong> <span class="muted">' + langLabel(p.lang) + ' · ⭐ ' + (p.game.stars || 0) + '</span></div>' +
+        '<div class="btn-row">' +
         '<button class="btn ghost" data-act="parents-edit" data-id="' + esc(p.id) + '">' + t("editProfile") + '</button>' +
-        '</div>';
+        '<button class="btn ghost" data-act="parents-report" data-id="' + esc(p.id) + '">' + t("viewReport") + '</button>' +
+        '<button class="btn ghost" data-act="parents-reset-progress" data-id="' + esc(p.id) + '">' + t("resetProgress") + '</button>' +
+        '<button class="btn ghost" data-act="parents-delete" data-id="' + esc(p.id) + '" style="color:var(--c-red)">' + t("deleteProfile") + '</button>' +
+        '</div></div>';
     });
     html += '<div class="spacer"></div><div class="practice-actions">' +
       (store.profiles.length >= Profiles.MAX_PROFILES
         ? '<p class="muted">' + t("limitReached") + '</p>'
         : '<button class="btn primary" data-act="parents-new">＋ ' + t("newProfile") + '</button>') +
+      (store.profiles.length ? '<button class="btn ghost" data-act="parents-reset-all" style="color:var(--c-red)">' + t("resetAll") + '</button>' : '') +
       '<button class="btn ghost" data-act="parents-exit">' + t("exitParents") + '</button></div></div>';
     parentsScreen(html);
+  }
+
+  // Ejecuta fn con `state` sustituido temporalmente por el del perfil indicado (p. ej. para su informe)
+  function withProfile(id, fn) {
+    var p = Profiles.findProfile(store, id), saved = state;
+    if (!p) return;
+    state = Profiles.toState(p);
+    try { fn(); } finally { state = saved; }
   }
 
   function newDraft() {
@@ -4678,6 +4705,25 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
       parentDraft = { id: p.id, name: p.name, avatar: p.avatar, lang: p.lang, theme: p.theme,
         readScale: p.readScale, readFont: p.readFont, sound: p.sound };
       renderProfileForm(); return true;
+    }
+    if (act === "parents-report") {
+      var rp = Profiles.findProfile(store, tg.dataset.id);
+      if (rp) withProfile(rp.id, parentSheet);
+      return true;
+    }
+    if (act === "parents-reset-progress" || act === "parents-delete") {
+      var dp = Profiles.findProfile(store, tg.dataset.id);
+      if (!dp) return true;
+      var del = act === "parents-delete";
+      if (confirm(t(del ? "confirmDelete" : "confirmResetProgress").replace("{name}", dp.name))) {
+        if (del) Profiles.deleteProfile(store, dp.id); else Profiles.resetProgress(store, dp.id);
+        persistStore(); renderParentsHome();
+      }
+      return true;
+    }
+    if (act === "parents-reset-all") {
+      if (confirm(t("confirmResetAll"))) { store = Profiles.resetAll(); persistStore(); renderParentsHome(); }
+      return true;
     }
     if (act === "profile-cancel") { parentDraft = null; renderParentsHome(); return true; }
     if (act === "profile-save") { if (parentDraft) saveProfileDraft(); return true; }
@@ -4760,8 +4806,6 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
       });
     }
 
-    html += '<div class="spacer"></div>' +
-      '<button class="btn ghost" data-act="reset" style="color:var(--c-red)">\uD83D\uDDD1\ufe0f ' + t("resetProfile") + '</button>';
     openSheet(html);
   }
 

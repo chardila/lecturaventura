@@ -4394,6 +4394,19 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
       skillBar(t("vocabulary"), bt.vocab) +
       '<div class="mission done"><span class="big-ic">\uD83D\uDCA1</span><div style="flex:1"><strong>' + t("focusTip") + '</strong><br><span class="muted">' + tip + '</span></div></div>';
 
+    if (state.lang === "es") {
+      ensurePractice();
+      var ps = state.practice.sessions;
+      html += '<div class="spacer"></div><h3>\uD83D\uDDE3\uFE0F ' + t("parentPractice") + '</h3>';
+      if (!ps.length) html += '<p class="muted">' + t("noData") + '</p>';
+      else {
+        html += '<div class="row"><span>' + t("parentLastSessions") + '</span><strong>' + t("parentWpm") + ' \u00b7 ' + t("parentHelped") + '</strong></div>';
+        ps.slice(0, 8).forEach(function (p) {
+          html += '<div class="row"><span>' + p.date + '</span><strong>' + p.wpm + ' \u00b7 ' + p.helped + '</strong></div>';
+        });
+      }
+    }
+
     html += '<div class="spacer"></div><h3>' + t("worldProgress") + '</h3>';
     worlds().forEach(function (wld) {
       var done = wld.stories.filter(function (s) { return state.finished[s.id]; }).length;

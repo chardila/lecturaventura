@@ -26,8 +26,9 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 - Pendiente: revisar que exista una voz `es-CO` en el dispositivo de la niña (si no, el navegador usa otra variante del español)
 
 ## Backlog (por orden de prioridad provisional)
-1. **Modo "escucha y repite"**: la app (o el padre) lee una frase con buen ritmo y la niña lee *la misma frase*.
-2. **Escucha y corrección suave**: reconocimiento de voz; decirle con ternura si la leyó bien; evitar el tono de regaño.
+1. ~~**Modo "escucha y repite"**~~ (parcial: botón 🔊 "Oír la frase" con la voz del iPad; falta audio modelo neuronal/grabado)
+   - Original: **Modo "escucha y repite"**: la app (o el padre) lee una frase con buen ritmo y la niña lee *la misma frase*.
+2. ~~**Escucha y corrección suave**~~ HECHO en versión iPad (modo Práctica en voz alta). Pendiente: Fire (APK con Vosk), inglés, ajustar umbrales tras la prueba real. Original: reconocimiento de voz; decirle con ternura si la leyó bien; evitar el tono de regaño.
 3. **Frenar la adivinanza**: ejercicios que premien leer lo que dice el texto (no la palabra supuesta); pista suave al fallar en vez de "no".
 4. **Quitar la presión de tiempo** para esta niña (desactivar contador y jokers).
 5. **Menos dependencia de imágenes**: historias en las que la imagen no revele el texto.

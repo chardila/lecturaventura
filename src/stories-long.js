@@ -297,6 +297,105 @@
       }
     ]
   });
+  dani.stories.push({
+    id: "dani-2",
+    level: 2,
+    wpm: 100,
+    title: { es: "El hámster del salón", en: "The Class Hamster" },
+    intro: {
+      es: "Dani cuida a Bigotes el fin de semana, pero Bigotes desaparece.",
+      en: "Danny looks after Whiskers for the weekend, but Whiskers disappears."
+    },
+    sections: [
+      {
+        text: {
+          es: "Cuaderno de Dani. Viernes. Hoy me eligieron para algo importante. La profe Marta me dio a Bigotes, el hámster de la clase. Tengo que cuidarlo todo el fin de semana. Bigotes es pequeñito, dorado y con las mejillas siempre llenas. La profe me dio una lista de reglas. Uno: darle de comer dos veces al día. Dos: ponerle agua fresca. Tres: cerrar bien la puerta de la jaula. Yo dije que sí a todo. Llevé la jaula a casa con mucho cuidado, como si fuera una torta de cumpleaños. Papá dijo que los hámsteres son pequeños, pero muy listos. Puse agua y comida en mi escritorio y lo miré un buen rato. Bigotes se lavó la carita con sus patitas. Qué ternura. Lola se asomó a mirar. «¡Hola, Bigotes!», le dijo. Croqueta también miró. Movió la cola tan fuerte que tiró una planta.",
+          en: "Danny's notebook. Friday. Today they picked me for something important. Miss Marta gave me Whiskers, the class hamster. I have to take care of him all weekend. Whiskers is tiny, golden and always has full cheeks. Miss Marta gave me a list of rules. One: feed him twice a day. Two: give him fresh water. Three: close the cage door tight. I said yes to everything. I carried the cage home very carefully, as if it were a birthday cake. Dad said hamsters are small, but very clever. I put water and food on my desk and watched him for a long time. Whiskers washed his face with his tiny paws. So cute. Lola came to look. \"Hello, Whiskers!\" she said. Crouton looked too. He wagged his tail so hard that he knocked over a plant."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Quién es Bigotes?", en: "Who is Whiskers?" },
+            { es: ["El hámster de la clase", "El gato del vecino", "Un pez de colores", "Un conejo"], en: ["The class hamster", "The neighbor's cat", "A goldfish", "A rabbit"] }, 0),
+          task("vocab",
+            { es: "¿Qué quiere decir «jaula»?", en: "What does \"cage\" mean?" },
+            { es: ["Una casita con rejas para un animal", "Una caja de zapatos", "Un cuarto grande", "Una canasta de frutas"], en: ["A little house with bars for an animal", "A shoe box", "A big room", "A fruit basket"] }, 0,
+            { word: { es: "jaula", en: "cage" }, fact: { es: "Los hámsteres duermen de día y juegan de noche.", en: "Hamsters sleep in the day and play at night." } })
+        ]
+      },
+      {
+        text: {
+          es: "Sábado. Me desperté con el sol en la cara. Me acordé de Bigotes y salté de la cama. Fui a ver la jaula. Estaba abierta. Y adentro no había nadie. Solo había un poco de aserrín y una semilla de girasol. Mi corazón hizo ¡pum, pum, pum! Revisé debajo de la cama. Revisé dentro de las botas. Revisé dentro del refrigerador y hasta en el bolsillo de mi pijama. Revisé hasta dentro de la tostadora. Nada. Entonces me acordé de la regla número tres. La puerta debía estar bien cerrada. Y yo la había cerrado, pero a medias. ¡Qué mala pata! Corrí al cuarto de Lola y la desperté de un salto. «Lola, Bigotes se escapó», le dije. «Tenemos que encontrarlo antes de que mamá se levante». Lola se frotó los ojos. «¿Un hámster? Entonces necesitamos un plan», dijo muy seria, y se puso sus pantuflas de conejo.",
+          en: "Saturday. I woke up with the sun on my face. I remembered Whiskers and jumped out of bed. I went to check the cage. It was open. And there was nobody inside. There was only some sawdust and one sunflower seed. My heart went thump, thump, thump! I checked under the bed. I checked inside the boots. I checked the fridge and even my pajama pocket. I even checked inside the toaster. Nothing. Then I remembered rule number three. The door had to be closed tight. And I had closed it, but only halfway. What bad luck! I ran to Lola's room and woke her up with a jump. \"Lola, Whiskers escaped,\" I told her. \"We have to find him before Mom gets up.\" Lola rubbed her eyes. \"A hamster? Then we need a plan,\" she said very seriously, and put on her bunny slippers."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Por qué se escapó Bigotes?", en: "Why did Whiskers get out?" },
+            { es: ["Porque la puerta no estaba bien cerrada", "Porque Lola abrió la jaula", "Porque Croqueta la rompió", "Porque la jaula era muy pequeña"], en: ["Because the door was not closed tight", "Because Lola opened the cage", "Because Crouton broke it", "Because the cage was too small"] }, 0),
+          task("predict",
+            { es: "¿Qué crees que harán Dani y Lola ahora?", en: "What do you think Danny and Lola will do now?" },
+            { es: ["Buscar a Bigotes por toda la casa", "Dormir otra vez", "Salir a jugar al parque", "Comer panqueques"], en: ["Look for Whiskers all over the house", "Go back to sleep", "Go play at the park", "Eat pancakes"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Llamé a Beto por teléfono. Llegó en diez minutos con una linterna y una lupa. Se puso la linterna en la frente, aunque era de día. Beto cree que todos los casos se resuelven con una lupa. Hicimos el plan número uno. Esparcimos semillas de girasol por el pasillo, para atraer a Bigotes. Pero Croqueta llegó primero y se las comió todas. Plan número dos. Echamos harina en el suelo para ver las huellas del hámster. Lola echó tanta harina que la cocina parecía una tormenta de nieve. Aparecieron muchas huellas. Todas eran de Croqueta. Él se sentó en medio de la harina, blanco de pies a cabeza, y sonrió con la lengua afuera. «Dani, tu perro es el peor detective del mundo», dijo Beto. Mamá apareció en la puerta de la cocina en bata. Miró la harina. Miró a Croqueta. Cerró los ojos y volvió a su cuarto. Creo que pensó que soñaba.",
+          en: "I called Beto on the phone. He got here in ten minutes with a flashlight and a magnifying glass. He put the flashlight on his forehead, even though it was daytime. Beto thinks every case can be solved with a magnifying glass. We made plan number one. We scattered sunflower seeds in the hallway to attract Whiskers. But Crouton got there first and ate them all. Plan number two. We spread flour on the floor to see the hamster's tracks. Lola spread so much flour that the kitchen looked like a snowstorm. Lots of tracks appeared. They were all Crouton's. He sat in the middle of the flour, white from head to toe, and smiled with his tongue out. \"Danny, your dog is the worst detective in the world,\" said Beto. Mom appeared at the kitchen door in her robe. She looked at the flour. She looked at Crouton. She closed her eyes and went back to her room. I think she thought she was dreaming."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué pasa con las semillas del plan número uno?", en: "What happens to the seeds in plan number one?" },
+            { es: ["Croqueta se las come", "Bigotes se las lleva", "Lola las guarda", "El viento las sopla"], en: ["Crouton eats them", "Whiskers takes them", "Lola saves them", "The wind blows them away"] }, 0),
+          task("vocab",
+            { es: "¿Qué es una «lupa»?", en: "What is a \"magnifying glass\"?" },
+            { es: ["Un vidrio que hace ver las cosas más grandes", "Una linterna pequeña", "Un tipo de lente de sol", "Un espejo roto"], en: ["A glass that makes things look bigger", "A small flashlight", "A kind of sunglasses", "A broken mirror"] }, 0,
+            { word: { es: "lupa", en: "magnifying glass" }, fact: { es: "Los detectives de los cuentos siempre llevan una lupa.", en: "Detectives in stories always carry a magnifying glass." } })
+        ]
+      },
+      {
+        text: {
+          es: "Estábamos los tres tirados en el suelo, llenos de harina, sin ideas. Mamá se había levantado, pero seguía dormida frente al café. De pronto Lola levantó el dedo. «Silencio», dijo. Nos quedamos quietos. Beto cruzó los dedos. Croqueta, por una vez, dejó de mover la cola. Se oía el reloj. Se oía la nevera. Se oía mi estómago. Y debajo de todo eso, un sonido muy chiquito: tic, tic, tic. «¡Viene del cuarto de papá!», susurró Beto. Caminamos de puntillas, uno detrás de otro, con Croqueta al final. Abrimos la puerta sin hacer ruido. El cuarto estaba en penumbra. Sobre la cómoda estaba el sombrero de copa de papá, el que me prestó para el truco de magia. Y el sonido venía de ahí dentro. Me temblaban las manos otra vez, pero esta vez de emoción.",
+          en: "The three of us were lying on the floor, covered in flour, with no ideas. Mom had gotten up, but she was still half asleep in front of her coffee. Suddenly Lola raised a finger. \"Quiet,\" she said. We stayed still. Beto crossed his fingers. Crouton, for once, stopped wagging his tail. We could hear the clock. We could hear the fridge. We could hear my stomach. And under all that, a tiny sound: tick, tick, tick. \"It is coming from Dad's room!\" whispered Beto. We tiptoed, one behind the other, with Crouton at the end. We opened the door without a sound. The room was dim. On the dresser sat Dad's top hat, the one he lent me for the magic trick. And the sound was coming from inside it. My hands were shaking again, but this time with excitement."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿De dónde venía el sonido tic, tic, tic?", en: "Where was the tick, tick, tick sound coming from?" },
+            { es: ["Del sombrero de copa de papá", "De la nevera", "De debajo de la cama", "De la tostadora"], en: ["From Dad's top hat", "From the fridge", "From under the bed", "From the toaster"] }, 0),
+          task("predict",
+            { es: "¿Qué crees que hay dentro del sombrero?", en: "What do you think is inside the hat?" },
+            { es: ["Bigotes", "Un conejo de verdad", "Un calcetín viejo", "Nada"], en: ["Whiskers", "A real rabbit", "An old sock", "Nothing"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Lola se subió a una silla con mucho cuidado. Yo sostenía la silla. Beto sostenía a Lola. Croqueta sostenía a Beto, o por lo menos lo intentaba. Lola se asomó al sombrero. «¡Está aquí!», dijo en voz muy baja. Dentro del sombrero, hecho una bolita dorada, dormía Bigotes. Tenía las mejillas llenas de semillas y una sonrisa chiquita. Parecía el hámster más feliz del mundo. Debió de subir por la cortina durante la noche y se quedó dormido en su nueva casa. Bajé a Lola de la silla. Levanté el sombrero con las dos manos, como si fuera una torta con velas. Bigotes bostezó. Todos aplaudimos sin hacer ruido. Beto sacó su lupa y miró a Bigotes de cerca. «Caso resuelto», dijo con voz de detective de película. Lola bailó un baile de victoria con sus pantuflas de conejo.",
+          en: "Lola climbed onto a chair very carefully. I held the chair. Beto held Lola. Crouton held Beto, or at least he tried. Lola peeked into the hat. \"He is here!\" she said in a tiny voice. Inside the hat, curled into a golden ball, Whiskers was sleeping. His cheeks were full of seeds and he had a little smile. He looked like the happiest hamster in the world. He must have climbed up the curtain during the night and fallen asleep in his new home. I helped Lola down from the chair. I lifted the hat with both hands, as if it were a cake with candles. Whiskers yawned. We all clapped without making a sound. Beto took out his magnifying glass and looked at Whiskers up close. \"Case closed,\" he said in a movie-detective voice. Lola did a victory dance in her bunny slippers."
+        },
+        tasks: [
+          task("retell",
+            { es: "¿Dónde estaba Bigotes?", en: "Where was Whiskers?" },
+            { es: ["Durmiendo dentro del sombrero de copa", "Escondido en la tostadora", "Debajo de la cama de Lola", "En el jardín"], en: ["Sleeping inside the top hat", "Hidden in the toaster", "Under Lola's bed", "In the yard"] }, 0),
+          task("syllable",
+            { es: "Junta las sílabas de forma correcta.", en: "Put the syllables together correctly." },
+            { es: ["Há-ms-ter", "Hám-s-ter", "Hám-ster", "Ham-ster-á"], en: ["Ham-ster", "Hams-ter", "Ha-mster", "Hamst-er"] }, 2)
+        ]
+      },
+      {
+        text: {
+          es: "Pusimos a Bigotes en su jaula. Esta vez cerré la puerta con dos candados de mentira, o sea, con dos ganchos de ropa. Después mamá nos hizo limpiar la harina de la cocina. Tardamos una hora. Lola hizo ángeles de harina en el piso y dijo que fue la mejor tarea del mundo. Croqueta se acercó despacito. Bigotes lo miró desde atrás de las rejas. Croqueta le dio un lengüetazo chiquito en la nariz. Bigotes estornudó. Todos nos reímos. El lunes le devolví a Bigotes a la profe Marta. Ella lo miró y dijo: «Qué bien se ve. Parece que descansó muchísimo». Yo asentí con la cabeza y no dije nada. Cuaderno de Dani: Cierra bien la puerta de la jaula. Tengo una hermanita que es detective oficial. Y mi perro hace buenos amigos, aunque sea un desastre.",
+          en: "We put Whiskers back in his cage. This time I closed the door with two pretend locks, that is, two clothespins. Then Mom had us clean the flour off the kitchen. It took an hour. Lola made flour angels on the floor and said it was the best chore in the world. Crouton came closer slowly. Whiskers looked at him from behind the bars. Crouton gave him a tiny lick on the nose. Whiskers sneezed. We all laughed. On Monday I gave Whiskers back to Miss Marta. She looked at him and said: \"He looks great. It seems he rested a lot.\" I nodded and said nothing. Danny's notebook: Close the cage door tight. I have a little sister who is an official detective. And my dog makes good friends, even if he is a mess."
+        },
+        tasks: [
+          task("retell",
+            { es: "¿Qué aprende Dani al final?", en: "What does Danny learn at the end?" },
+            { es: ["A cerrar bien la puerta de la jaula", "A no cuidar animales nunca más", "A esconder las semillas", "A dormir con el hámster"], en: ["To close the cage door tight", "To never take care of animals again", "To hide the seeds", "To sleep with the hamster"] }, 0),
+          task("spellfix",
+            { es: "¿Qué palabra está mal escrita?", en: "Which word is spelled wrong?" },
+            { es: ["Jaula", "Estornudó", "Bigotes", "Detectibe"], en: ["Cage", "Sneezed", "Hamster", "Detectiv"] }, 3,
+            { hint: { es: "«Detective» se escribe con v.", en: "\"Detective\" ends with ive." } })
+        ]
+      }
+    ]
+  });
   // @dani-stories
 
   CONTENT.worlds.push(mili, dani);

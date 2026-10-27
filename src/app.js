@@ -1078,6 +1078,7 @@
       '<div class="row"><span>' + t("readFont") + '</span>' + seg("readFont", [{ v: "standard", l: t("standard") }, { v: "dyslexia", l: t("easyRead") }, { v: "serif", l: "Serif" }], d.readFont) + '</div>' +
       '<div class="row"><span>' + t("sound") + '</span>' + seg("sound", [{ v: "on", l: t("on") }, { v: "off", l: t("off") }], d.sound ? "on" : "off") + '</div>' +
       '<div class="row"><span>' + t("timersLabel") + '</span>' + seg("timers", [{ v: "on", l: t("on") }, { v: "off", l: t("off") }], d.timers ? "on" : "off") + '</div>' +
+      '<div class="row"><span>' + t("storiesLabel") + '</span>' + seg("stories", [{ v: "all", l: t("storiesAll") }, { v: "short", l: t("storiesShort") }, { v: "long", l: t("storiesLong") }], d.stories) + '</div>' +
       '<div class="practice-msg" id="parents-msg" role="status">' + (msg || "") + '</div>' +
       '<div class="practice-actions"><button class="btn primary big" data-act="profile-save">' + t("profileSave") + '</button>' +
       '<button class="btn ghost" data-act="profile-cancel">' + t("profileCancel") + '</button></div></div>');
@@ -1086,7 +1087,7 @@
   function saveProfileDraft() {
     readDraftName();
     var d = parentDraft, res;
-    var settings = { name: d.name, avatar: d.avatar, lang: d.lang, theme: d.theme, readScale: d.readScale, readFont: d.readFont, sound: d.sound, timers: d.timers };
+    var settings = { name: d.name, avatar: d.avatar, lang: d.lang, theme: d.theme, readScale: d.readScale, readFont: d.readFont, sound: d.sound, timers: d.timers, stories: d.stories };
     if (d.id) res = Profiles.updateProfile(store, d.id, settings);
     else {
       res = Profiles.addProfile(store, { name: d.name, avatar: d.avatar, lang: d.lang });
@@ -1118,7 +1119,7 @@
       var p = Profiles.findProfile(store, tg.dataset.id);
       if (!p) return true;
       parentDraft = { id: p.id, name: p.name, avatar: p.avatar, lang: p.lang, theme: p.theme,
-        readScale: p.readScale, readFont: p.readFont, sound: p.sound, timers: p.timers };
+        readScale: p.readScale, readFont: p.readFont, sound: p.sound, timers: p.timers, stories: p.stories };
       renderProfileForm(); return true;
     }
     if (act === "parents-report") {

@@ -394,6 +394,8 @@ const UI = {
     chooseWorld: "Elige tu mundo",
     locked: "Aún bloqueado",
     unlockAt: "Se abre con {n} ⭐",
+    longStories: "Historias largas",
+    seriesLocked: "Termina la historia anterior para abrir esta",
     stories: "Historias",
     whoPlays: "¿Quién juega?",
     parentZone: "Zona de padres",
@@ -560,6 +562,8 @@ const UI = {
     chooseWorld: "Choose your world",
     locked: "Still locked",
     unlockAt: "Unlocks at {n} ⭐",
+    longStories: "Long stories",
+    seriesLocked: "Finish the previous story to open this one",
     stories: "Stories",
     whoPlays: "Who is playing?",
     parentZone: "Parents' area",
@@ -3136,6 +3140,32 @@ const CONTENT = {
     }
   ]
 };
+// Historias largas (series «Mili y Nubi» y «Dani Mala Pata»), en español e inglés.
+// Se añaden a CONTENT.worlds; ver docs/superpowers/specs/2026-10-27-historias-largas-design.md
+CONTENT.worlds.push(
+  {
+    id: "mili",
+    emoji: "☁️",
+    color: "#7cc4ff",
+    long: true,
+    series: true,
+    name: { es: "Mili y Nubi", en: "Millie and Puff" },
+    desc: { es: "Una niña y su nubecita traviesa.", en: "A girl and her playful little cloud." },
+    unlockStars: 0,
+    stories: []
+  },
+  {
+    id: "dani",
+    emoji: "📓",
+    color: "#ff9f43",
+    long: true,
+    series: true,
+    name: { es: "Dani Mala Pata", en: "Danny Bad Luck" },
+    desc: { es: "El cuaderno de un niño con mala suerte y mucho humor.", en: "The notebook of a boy with bad luck and lots of laughs." },
+    unlockStars: 0,
+    stories: []
+  }
+);
 // Lógica pura del modo "Práctica en voz alta" (sin DOM; se prueba en Node).
 var Practice = (function () {
   "use strict";
@@ -3428,12 +3458,13 @@ var Profiles = (function () {
   var NAME_MAX = 20;
   var AVATARS = ["🦊", "🐙", "🐼", "🦁", "🐸", "🐵",
     "🦄", "🐢", "🐧", "🦉", "🐬", "🐝"];
-  var SETTING_KEYS = ["name", "avatar", "lang", "theme", "readScale", "readFont", "sound", "timers"];
+  var SETTING_KEYS = ["name", "avatar", "lang", "theme", "readScale", "readFont", "sound", "timers", "stories"];
   var LANGS = ["es", "en"];
   var CHOICES = {
     theme: ["light", "dark"],
     readScale: ["small", "normal", "large"],
-    readFont: ["standard", "dyslexia", "serif"]
+    readFont: ["standard", "dyslexia", "serif"],
+    stories: ["all", "short", "long"]
   };
 
   function emptyStore() { return { version: STORE_VERSION, lastLang: null, profiles: [] }; }
@@ -3471,6 +3502,7 @@ var Profiles = (function () {
       readFont: CHOICES.readFont.indexOf(p.readFont) >= 0 ? p.readFont : "standard",
       sound: typeof p.sound === "boolean" ? p.sound : true,
       timers: typeof p.timers === "boolean" ? p.timers : true,
+      stories: CHOICES.stories.indexOf(p.stories) >= 0 ? p.stories : "all",
       game: Object.assign(defaultGame(), isObj(p.game) ? p.game : {})
     };
   }
@@ -3518,7 +3550,7 @@ var Profiles = (function () {
     }
     var profile = {
       id: newId(store), name: checked.name, avatar: checked.avatar, lang: checked.lang,
-      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, game: defaultGame()
+      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, stories: "all", game: defaultGame()
     };
     store.profiles.push(profile);
     return { ok: true, profile: profile };
@@ -3598,6 +3630,29 @@ var Profiles = (function () {
 })();
 
 if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
+// Lógica pura de qué historias se ven y cuáles están abiertas (sin DOM; se prueba en Node).
+var Library = (function () {
+  "use strict";
+
+  function visibleWorlds(worlds, lang, mode) {
+    return worlds.filter(function (w) {
+      if (!w.stories.length || !w.stories[0].title || w.stories[0].title[lang] == null) return false;
+      if (mode === "short") return !w.long;
+      if (mode === "long") return !!w.long;
+      return true;
+    });
+  }
+
+  // En un mundo con `series`, cada historia se abre al terminar la anterior.
+  function isStoryOpen(world, index, finished) {
+    if (!world.series || index <= 0) return true;
+    return !!(finished && finished[world.stories[index - 1].id]);
+  }
+
+  return { visibleWorlds: visibleWorlds, isStoryOpen: isStoryOpen };
+})();
+
+if (typeof module !== "undefined" && module.exports) module.exports = Library;
 /* ============================================================
    LecturAventura – Lógica de la app
    ------------------------------------------------------------
@@ -3627,7 +3682,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
   var activeId = null;
   function baseState(lang) {
     return Profiles.toState({ name: "", avatar: "", lang: lang, theme: "light", readScale: "normal",
-      readFont: "standard", sound: true, timers: true, game: Profiles.defaultGame() });
+      readFont: "standard", sound: true, timers: true, stories: "all", game: Profiles.defaultGame() });
   }
   var state = baseState(Profiles.defaultUiLang(store.lastLang, navigator.language));
   var session = null;
@@ -3662,10 +3717,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
   }
   // Solo los mundos con historias en el idioma elegido (CONTENT.worlds es la lista completa)
   function worlds() {
-    var lang = state.lang || "es";
-    return CONTENT.worlds.filter(function (w) {
-      return w.stories.length && w.stories[0].title && w.stories[0].title[lang] != null;
-    });
+    return Library.visibleWorlds(CONTENT.worlds, state.lang || "es", state.stories);
   }
   function fmt(str, n) { return String(str).replace("{n}", n); }
 
@@ -3831,11 +3883,10 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
       '<button class="btn ghost" data-act="discover">\uD83D\uDD2D ' + t("discover") + '</button>' +
       '<button class="btn ghost" data-act="collection">\uD83D\uDCD5 ' + t("collection") + '</button>' +
       (state.lang === "es" ? '<button class="btn ghost" data-act="practice">\uD83D\uDDE3\uFE0F ' + t("practiceTitle") + '</button>' : '') + '</div>';
-    html += '<div class="map grid cards">';
-    worlds().forEach(function (world) {
+    function worldCard(world) {
       var unlocked = state.stars >= world.unlockStars;
       var done = world.stories.filter(function (s) { return state.finished[s.id]; }).length;
-      html += '<button class="card' + (unlocked ? "" : " locked") + '" ' +
+      return '<button class="card' + (unlocked ? "" : " locked") + '" ' +
         (unlocked ? 'data-world="' + world.id + '"' : 'data-locked="1"') + '>' +
         (unlocked ? "" : '<span class="lock">\uD83D\uDD12</span>') +
         '<span class="emoji">' + world.emoji + '</span>' +
@@ -3845,7 +3896,13 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
           ? ('\u2b50 ' + done + '/' + world.stories.length + ' \u00b7 ' + world.stories.length + ' ' + t("stories"))
           : fmt(t("unlockAt"), world.unlockStars)) + '</p>' +
         '</button>';
-    });
+    }
+    var shortWorlds = worlds().filter(function (x) { return !x.long; });
+    var longWorlds = worlds().filter(function (x) { return x.long; });
+    html += '<div class="map grid cards">' + shortWorlds.map(worldCard).join("") + '</div>';
+    if (longWorlds.length)
+      html += '<h2 style="margin:18px 0 8px">' + t("longStories") + ' \uD83D\uDCD6</h2>' +
+        '<div class="map grid cards">' + longWorlds.map(worldCard).join("") + '</div>';
     html += '</div></section>';
     w.innerHTML = html;
   }
@@ -3866,10 +3923,13 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
       '<div class="btn-row spacer"><button class="btn ghost" data-act="home">\u2190 ' + t("map") + '</button></div>' +
       '<section><h1>' + world.emoji + ' ' + loc(world.name) + '</h1>' +
       '<p class="muted">' + t("chooseStory") + '</p><div class="grid cards">';
-    world.stories.forEach(function (story) {
+    world.stories.forEach(function (story, idx) {
       var mins = estimateStoryMinutes(story);
       var fin = state.finished[story.id];
-      html += '<button class="card" data-story="' + story.id + '">' +
+      var open = Library.isStoryOpen(world, idx, state.finished);
+      html += '<button class="card' + (open ? "" : " locked") + '" ' +
+        (open ? 'data-story="' + story.id + '"' : 'data-locked-story="1"') + '>' +
+        (open ? "" : '<span class="lock">\uD83D\uDD12</span>') +
         '<span class="emoji">' + world.emoji + '</span>' +
         '<h3>' + loc(story.title) + (fin ? ' \u2b50' : '') + '</h3>' +
         '<p class="meta">' + loc(story.intro) + '</p>' +
@@ -3883,15 +3943,15 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
 
   /* ---------- Lesezeit realistisch schaetzen ---------- */
   function countWords(str) { return (str.trim().match(/\S+/g) || []).length; }
-  function sectionSeconds(section, level) {
+  function sectionSeconds(section, level, wpm) {
     var words = countWords(loc(section.text));
-    var read = words / WPM[level] * 60;
+    var read = words / (wpm || WPM[level]) * 60;
     var tasks = (section.tasks ? section.tasks.length : 0) * TASK_SECONDS;
     return Math.max(25, Math.round(read + tasks));
   }
   function estimateStoryMinutes(story) {
     var total = 0;
-    story.sections.forEach(function (s) { total += sectionSeconds(s, story.level); });
+    story.sections.forEach(function (s) { total += sectionSeconds(s, story.level, story.wpm); });
     return Math.max(1, Math.round(total / 60));
   }
 
@@ -3902,8 +3962,11 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
      ============================================================ */
   function startSession(storyId, mode) {
     var info = findStory(storyId);
+    if (info && !Library.isStoryOpen(info.world, info.world.stories.indexOf(info.story), state.finished)) {
+      toast("\uD83D\uDD12 " + t("seriesLocked")); return;
+    }
     var totalSecs = 0;
-    info.story.sections.forEach(function (s) { totalSecs += sectionSeconds(s, info.story.level); });
+    info.story.sections.forEach(function (s) { totalSecs += sectionSeconds(s, info.story.level, info.story.wpm); });
     totalSecs = Math.round(totalSecs * 1.15);   // ein einziger, kindgerechter Standard-Modus
 
     session = {
@@ -4647,7 +4710,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
 
   function newDraft() {
     return { id: null, name: "", avatar: Profiles.AVATARS[0], lang: state.lang === "en" ? "en" : "es",
-      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true };
+      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, stories: "all" };
   }
   function readDraftName() { var i = $("#profile-name"); if (i && parentDraft) parentDraft.name = i.value; }
 
@@ -4911,7 +4974,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
      EVENT-DELEGATION (ein Listener fuer Touch/Click)
      ============================================================ */
   document.addEventListener("click", function (e) {
-    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story],[data-pset]");
+    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-locked-story],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story],[data-pset]");
     if (!tg) return;
 
     // Formulario de perfil (zona de padres)
@@ -4937,6 +5000,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Profiles;
     }
     // Welt / Geschichte / Modus
     if (tg.dataset.locked) { toast("\uD83D\uDD12 " + t("locked")); return; }
+    if (tg.dataset.lockedStory) { toast("\uD83D\uDD12 " + t("seriesLocked")); return; }
     if (tg.dataset.world && !tg.dataset.act) { renderWorld(tg.dataset.world); show("screen-world"); return; }
     if (tg.dataset.story) { closeSheet(); startSession(tg.dataset.story, "standard"); return; }
     // Antwort-Option

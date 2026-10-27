@@ -27,7 +27,7 @@
   var activeId = null;
   function baseState(lang) {
     return Profiles.toState({ name: "", avatar: "", lang: lang, theme: "light", readScale: "normal",
-      readFont: "standard", sound: true, timers: true, game: Profiles.defaultGame() });
+      readFont: "standard", sound: true, timers: true, stories: "all", game: Profiles.defaultGame() });
   }
   var state = baseState(Profiles.defaultUiLang(store.lastLang, navigator.language));
   var session = null;
@@ -62,10 +62,7 @@
   }
   // Solo los mundos con historias en el idioma elegido (CONTENT.worlds es la lista completa)
   function worlds() {
-    var lang = state.lang || "es";
-    return CONTENT.worlds.filter(function (w) {
-      return w.stories.length && w.stories[0].title && w.stories[0].title[lang] != null;
-    });
+    return Library.visibleWorlds(CONTENT.worlds, state.lang || "es", state.stories);
   }
   function fmt(str, n) { return String(str).replace("{n}", n); }
 
@@ -231,11 +228,10 @@
       '<button class="btn ghost" data-act="discover">\uD83D\uDD2D ' + t("discover") + '</button>' +
       '<button class="btn ghost" data-act="collection">\uD83D\uDCD5 ' + t("collection") + '</button>' +
       (state.lang === "es" ? '<button class="btn ghost" data-act="practice">\uD83D\uDDE3\uFE0F ' + t("practiceTitle") + '</button>' : '') + '</div>';
-    html += '<div class="map grid cards">';
-    worlds().forEach(function (world) {
+    function worldCard(world) {
       var unlocked = state.stars >= world.unlockStars;
       var done = world.stories.filter(function (s) { return state.finished[s.id]; }).length;
-      html += '<button class="card' + (unlocked ? "" : " locked") + '" ' +
+      return '<button class="card' + (unlocked ? "" : " locked") + '" ' +
         (unlocked ? 'data-world="' + world.id + '"' : 'data-locked="1"') + '>' +
         (unlocked ? "" : '<span class="lock">\uD83D\uDD12</span>') +
         '<span class="emoji">' + world.emoji + '</span>' +
@@ -245,7 +241,13 @@
           ? ('\u2b50 ' + done + '/' + world.stories.length + ' \u00b7 ' + world.stories.length + ' ' + t("stories"))
           : fmt(t("unlockAt"), world.unlockStars)) + '</p>' +
         '</button>';
-    });
+    }
+    var shortWorlds = worlds().filter(function (x) { return !x.long; });
+    var longWorlds = worlds().filter(function (x) { return x.long; });
+    html += '<div class="map grid cards">' + shortWorlds.map(worldCard).join("") + '</div>';
+    if (longWorlds.length)
+      html += '<h2 style="margin:18px 0 8px">' + t("longStories") + ' \uD83D\uDCD6</h2>' +
+        '<div class="map grid cards">' + longWorlds.map(worldCard).join("") + '</div>';
     html += '</div></section>';
     w.innerHTML = html;
   }
@@ -266,10 +268,13 @@
       '<div class="btn-row spacer"><button class="btn ghost" data-act="home">\u2190 ' + t("map") + '</button></div>' +
       '<section><h1>' + world.emoji + ' ' + loc(world.name) + '</h1>' +
       '<p class="muted">' + t("chooseStory") + '</p><div class="grid cards">';
-    world.stories.forEach(function (story) {
+    world.stories.forEach(function (story, idx) {
       var mins = estimateStoryMinutes(story);
       var fin = state.finished[story.id];
-      html += '<button class="card" data-story="' + story.id + '">' +
+      var open = Library.isStoryOpen(world, idx, state.finished);
+      html += '<button class="card' + (open ? "" : " locked") + '" ' +
+        (open ? 'data-story="' + story.id + '"' : 'data-locked-story="1"') + '>' +
+        (open ? "" : '<span class="lock">\uD83D\uDD12</span>') +
         '<span class="emoji">' + world.emoji + '</span>' +
         '<h3>' + loc(story.title) + (fin ? ' \u2b50' : '') + '</h3>' +
         '<p class="meta">' + loc(story.intro) + '</p>' +
@@ -283,15 +288,15 @@
 
   /* ---------- Lesezeit realistisch schaetzen ---------- */
   function countWords(str) { return (str.trim().match(/\S+/g) || []).length; }
-  function sectionSeconds(section, level) {
+  function sectionSeconds(section, level, wpm) {
     var words = countWords(loc(section.text));
-    var read = words / WPM[level] * 60;
+    var read = words / (wpm || WPM[level]) * 60;
     var tasks = (section.tasks ? section.tasks.length : 0) * TASK_SECONDS;
     return Math.max(25, Math.round(read + tasks));
   }
   function estimateStoryMinutes(story) {
     var total = 0;
-    story.sections.forEach(function (s) { total += sectionSeconds(s, story.level); });
+    story.sections.forEach(function (s) { total += sectionSeconds(s, story.level, story.wpm); });
     return Math.max(1, Math.round(total / 60));
   }
 
@@ -302,8 +307,11 @@
      ============================================================ */
   function startSession(storyId, mode) {
     var info = findStory(storyId);
+    if (info && !Library.isStoryOpen(info.world, info.world.stories.indexOf(info.story), state.finished)) {
+      toast("\uD83D\uDD12 " + t("seriesLocked")); return;
+    }
     var totalSecs = 0;
-    info.story.sections.forEach(function (s) { totalSecs += sectionSeconds(s, info.story.level); });
+    info.story.sections.forEach(function (s) { totalSecs += sectionSeconds(s, info.story.level, info.story.wpm); });
     totalSecs = Math.round(totalSecs * 1.15);   // ein einziger, kindgerechter Standard-Modus
 
     session = {
@@ -1047,7 +1055,7 @@
 
   function newDraft() {
     return { id: null, name: "", avatar: Profiles.AVATARS[0], lang: state.lang === "en" ? "en" : "es",
-      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true };
+      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, stories: "all" };
   }
   function readDraftName() { var i = $("#profile-name"); if (i && parentDraft) parentDraft.name = i.value; }
 
@@ -1311,7 +1319,7 @@
      EVENT-DELEGATION (ein Listener fuer Touch/Click)
      ============================================================ */
   document.addEventListener("click", function (e) {
-    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story],[data-pset]");
+    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-locked-story],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story],[data-pset]");
     if (!tg) return;
 
     // Formulario de perfil (zona de padres)
@@ -1337,6 +1345,7 @@
     }
     // Welt / Geschichte / Modus
     if (tg.dataset.locked) { toast("\uD83D\uDD12 " + t("locked")); return; }
+    if (tg.dataset.lockedStory) { toast("\uD83D\uDD12 " + t("seriesLocked")); return; }
     if (tg.dataset.world && !tg.dataset.act) { renderWorld(tg.dataset.world); show("screen-world"); return; }
     if (tg.dataset.story) { closeSheet(); startSession(tg.dataset.story, "standard"); return; }
     // Antwort-Option

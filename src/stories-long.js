@@ -201,6 +201,102 @@
   });
   // @mili-stories
 
+  dani.stories.push({
+    id: "dani-1",
+    level: 2,
+    wpm: 100,
+    title: { es: "El truco de magia", en: "The Magic Trick" },
+    intro: {
+      es: "Dani y su perro Croqueta se apuntan al concurso de talentos.",
+      en: "Danny and his dog Crouton sign up for the talent show."
+    },
+    sections: [
+      {
+        text: {
+          es: "Cuaderno de Dani. Lunes. Hoy me pasó algo grandioso. Bueno, casi grandioso. Mi profe dijo que el viernes habrá un concurso de talentos en el colegio. ¡Y yo me apunté! Voy a hacer un truco de magia. Se llama «El conejo que no está». Es muy fácil. Pongo un conejo de peluche en un sombrero. Digo las palabras mágicas. Y el conejo desaparece. Lo ensayé en mi cuarto con mi hermanita Lola. Ella tiene cuatro años y lo ve todo. «Dani, el conejo está en tu manga», me dijo. Qué mala suerte. Pero no importa. Tengo cuatro días para mejorar el truco. Y tengo a Croqueta de ayudante. Croqueta es mi perro. Es grande, marrón y muy peludo. Nunca me hace caso, pero me quiere muchísimo. Mamá firmó mi permiso. Papá me prestó su sombrero de copa, que es del tamaño de un balde. Está un poco abollado, pero tiene mucha clase.",
+          en: "Danny's notebook. Monday. Something great happened to me today. Well, almost great. My teacher said there will be a talent show at school on Friday. And I signed up! I am going to do a magic trick. It is called \"The Rabbit That Is Not Here.\" It is very easy. I put a stuffed rabbit in a hat. I say the magic words. And the rabbit disappears. I practiced it in my room with my little sister Lola. She is four years old and she sees everything. \"Danny, the rabbit is in your sleeve,\" she told me. What bad luck. But it does not matter. I have four days to make the trick better. And I have Crouton as my helper. Crouton is my dog. He is big, brown and very fluffy. He never listens to me, but he loves me a lot. Mom signed my permission slip. Dad lent me his top hat, which is the size of a bucket. It is a little dented, but it has a lot of class."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué truco quiere hacer Dani?", en: "What trick does Danny want to do?" },
+            { es: ["Hacer desaparecer un conejo de peluche", "Sacar una moneda de la oreja", "Volar con una capa", "Adivinar un número"], en: ["Make a stuffed rabbit disappear", "Pull a coin from an ear", "Fly with a cape", "Guess a number"] }, 0),
+          task("vocab",
+            { es: "¿Qué quiere decir «ayudante»?", en: "What does \"helper\" mean?" },
+            { es: ["Alguien que ayuda", "Alguien que duerme", "Alguien que grita", "Alguien que se esconde"], en: ["Someone who helps", "Someone who sleeps", "Someone who shouts", "Someone who hides"] }, 0,
+            { word: { es: "ayudante", en: "helper" }, fact: { es: "Los magos casi siempre tienen un ayudante en el escenario.", en: "Magicians almost always have a helper on stage." } })
+        ]
+      },
+      {
+        text: {
+          es: "Martes. Ensayo número uno. Le puse a Croqueta una capa hecha con una cortina. Se veía muy elegante, hasta que se la comió. Ensayo número dos. Croqueta no quiso sentarse. Le ofrecí una galleta, pero se la comió y se fue. Quería perseguir una mosca. La mosca ganó. Ensayo número tres. Mi amigo Beto vino a mirar. Beto es muy serio y casi nunca se ríe. Pero esta vez se rió tanto que se cayó de la silla. «Dani, tu truco es un desastre», dijo. «Pero es un desastre muy divertido». Yo no sabía si enojarme o reírme. Lola aplaudía desde la puerta. «¡Otra vez, otra vez!», gritaba. Esa noche escribí en mi cuaderno: lo que puede salir mal, a veces sale peor. Beto dice que haga el truco con los ojos cerrados, así yo tampoco veré el desastre.",
+          en: "Tuesday. Practice number one. I put a cape on Crouton made from a curtain. He looked very fancy, until he ate it. Practice number two. Crouton did not want to sit. I offered him a cookie, but he ate it and left. He wanted to chase a fly. The fly won. Practice number three. My friend Beto came to watch. Beto is very serious and almost never laughs. But this time he laughed so hard that he fell off his chair. \"Danny, your trick is a disaster,\" he said. \"But it is a very funny disaster.\" I did not know whether to be mad or to laugh. Lola was clapping at the door. \"Again, again!\" she shouted. That night I wrote in my notebook: what can go wrong sometimes goes even wronger. Beto says I should do the trick with my eyes closed, so I will not see the disaster either."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué le pasa a la capa de Croqueta?", en: "What happens to Crouton's cape?" },
+            { es: ["Se la come", "Se la regala a Lola", "Se le pierde en el parque", "Se la lleva el viento"], en: ["He eats it", "He gives it to Lola", "He loses it in the park", "The wind takes it"] }, 0),
+          task("predict",
+            { es: "¿Qué crees que pasará el viernes en el concurso?", en: "What do you think will happen on Friday at the show?" },
+            { es: ["Algo saldrá mal, pero será divertido", "Todo saldrá perfecto sin ningún error", "El concurso se cancelará", "Dani se quedará dormido"], en: ["Something will go wrong, but it will be funny", "Everything will be perfect with no mistakes", "The show will be canceled", "Danny will fall asleep"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Jueves. Última práctica. Todo salió igual de mal que siempre. El conejo se cayó, Croqueta ladró y el sombrero terminó en el balde de la basura. Me senté en el suelo y suspiré. «No voy a ganar», le dije a Croqueta. Croqueta puso la cabeza sobre mis rodillas. Lola entró en pijama con su osito. «Dani, ¿por qué estás triste?», preguntó. «Porque mi truco siempre sale mal». Ella pensó un ratito, como piensan las niñas de cuatro años. «Los magos de la tele se equivocan un montón», dijo. «Pero siempre sonríen. Y entonces nadie se da cuenta». Me quedé mirándola. Entonces se me ocurrió algo. Si me equivocaba, iba a sonreír. Le di las gracias y le dije que era mi asistente de magia. Lola se puso tan contenta que hizo tres piruetas. Esa Lola sabe más de lo que parece.",
+          en: "Thursday. Last practice. Everything went as wrong as always. The rabbit fell, Crouton barked and the hat ended up in the trash can. I sat on the floor and sighed. \"I am not going to win,\" I told Crouton. Crouton put his head on my knees. Lola came in wearing pajamas, holding her teddy bear. \"Danny, why are you sad?\" she asked. \"Because my trick always goes wrong.\" She thought for a little while, the way four-year-olds think. \"The magicians on TV make mistakes all the time,\" she said. \"But they always smile. And then nobody notices.\" I just stared at her. Then I had an idea. If I made a mistake, I would smile. I thanked her and told her she was my magic assistant. Lola was so happy that she did three twirls. That Lola knows more than she seems to."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué consejo le da Lola a Dani?", en: "What advice does Lola give Danny?" },
+            { es: ["Sonreír aunque algo salga mal", "Rendirse y no ir al concurso", "Practicar con los ojos cerrados", "Cambiar de truco"], en: ["Smile even if something goes wrong", "Give up and skip the show", "Practice with his eyes closed", "Change his trick"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Viernes. El gran día. Mi estómago hacía piruetas. En el auditorio había muchos niños, maestros y papás. Un niño tocó la flauta. Una niña bailó con una pandereta. Otro se disfrazó de robot. Todos lo hicieron muy bien y el público aplaudió fuerte. Cada aplauso me ponía más nervioso. Yo miraba mis manos y estaban sudando. Croqueta estaba conmigo detrás de la cortina, moviendo la cola. Beto me dio una palmada en la espalda. «Tú puedes», dijo. «Aunque no sé cómo». Lola estaba sentada en la primera fila con mamá. Me saludó con las dos manos y me mandó un beso. Tomé aire, abracé a Croqueta y casi me olvido del conejo. Y entonces dijeron mi nombre por el micrófono: «¡Dani Torres y su ayudante Croqueta!»",
+          en: "Friday. The big day. My stomach was doing flips. In the auditorium there were lots of kids, teachers and parents. One boy played the flute. One girl danced with a tambourine. Another boy dressed up as a robot. They all did very well and the audience clapped loudly. Every clap made me more nervous. I looked at my hands and they were sweaty. Crouton was with me behind the curtain, wagging his tail. Beto gave me a pat on the back. \"You can do it,\" he said. \"Though I do not know how.\" Lola was sitting in the front row with Mom. She waved at me with both hands and blew me a kiss. I took a breath, hugged Crouton and almost forgot the rabbit. And then they said my name on the microphone: \"Danny Torres and his helper Crouton!\""
+        },
+        tasks: [
+          task("vocab",
+            { es: "¿Qué quiere decir «auditorio»?", en: "What does \"auditorium\" mean?" },
+            { es: ["Un salón grande con escenario", "Una cocina", "Un jardín", "Un autobús"], en: ["A big room with a stage", "A kitchen", "A garden", "A bus"] }, 0,
+            { word: { es: "auditorio", en: "auditorium" }, fact: { es: "En un auditorio se hacen obras de teatro y conciertos.", en: "Plays and concerts happen in an auditorium." } }),
+          task("quiz",
+            { es: "¿Quién saluda a Dani con las dos manos?", en: "Who waves at Danny with both hands?" },
+            { es: ["Lola", "Beto", "El director", "Croqueta"], en: ["Lola", "Beto", "The principal", "Crouton"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Salí al escenario con las rodillas temblando como gelatina. Las luces eran muy fuertes. Me acordé de Lola y sonreí. Puse el sombrero sobre la mesa. Levanté mi varita. «¡Abracadabra, pata de cabra!», grité. Metí el conejo de peluche en el sombrero y di tres golpecitos con la varita. Todos me miraban sin parpadear. Pero, ¡plaf!, la mesa se tambaleó. El sombrero cayó al piso y empezó a rodar. Croqueta pensó que era un juego. ¡Salió corriendo detrás del sombrero! Yo corrí detrás de Croqueta. Croqueta corrió alrededor de la mesa. Lola gritó: «¡Dani, el conejo vuela!». Yo me tropecé con mi capa. El conejo salió volando por el aire. Dio una vuelta y cayó en la cabeza del director. Todo el auditorio se quedó en silencio. Y de repente… ¡explotó de risa!",
+          en: "I walked onto the stage with my knees shaking like jelly. The lights were very bright. I remembered Lola and I smiled. I put the hat on the table. I raised my wand. \"Abracadabra, hocus-pocus!\" I shouted. I put the stuffed rabbit in the hat and tapped it three times with my wand. Everybody watched me without blinking. But, splat, the table wobbled. The hat fell to the floor and started to roll. Crouton thought it was a game. He ran after the hat! I ran after Crouton. Crouton ran around the table. Lola yelled: \"Danny, the rabbit is flying!\" I tripped on my cape. The rabbit flew through the air. It did a spin and landed on the principal's head. The whole auditorium went quiet. And suddenly... it burst out laughing!"
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Dónde cae el conejo de peluche?", en: "Where does the stuffed rabbit land?" },
+            { es: ["En la cabeza del director", "En el regazo de Lola", "Dentro del sombrero", "Sobre la mesa"], en: ["On the principal's head", "In Lola's lap", "Inside the hat", "On the table"] }, 0),
+          task("sentence",
+            { es: "Pon la oración en el orden correcto.", en: "Put the sentence in the right order." },
+            { es: ["Croqueta salió corriendo detrás del sombrero.", "Sombrero del detrás Croqueta corriendo salió.", "Corriendo salió sombrero Croqueta detrás del.", "Detrás salió Croqueta del corriendo sombrero."], en: ["Crouton ran after the hat.", "Hat the after ran Crouton.", "After Crouton hat the ran.", "Ran hat Crouton the after."] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Me quería esconder debajo de la alfombra. Sentí las orejas rojas como tomates. Pero Croqueta volvió con el sombrero en la boca. Se sentó frente a mí y levantó la pata. Parecía decir: «¡Hice mi parte!». Entonces hice una reverencia. Croqueta ladró e hizo una reverencia también, o algo parecido. El público se puso de pie y aplaudió. Mamá lloraba de risa. Papá filmaba todo con el celular, aunque lo tenía al revés. Hasta Beto se rió. El director me devolvió el conejo. «Es el mejor truco que he visto», dijo. «¡El conejo sí que desapareció… en mi cabeza!». Ganamos el primer premio: un diploma y una bolsa de galletas. Croqueta se comió las galletas y también el diploma, pero eso se lo cuento otro día. Cuaderno de Dani: mala suerte, diez. Diversión, cien.",
+          en: "I wanted to hide under the rug. My ears felt red as tomatoes. But Crouton came back with the hat in his mouth. He sat in front of me and raised his paw. He seemed to say: \"I did my part!\" So I took a bow. Crouton barked and took a bow too, or something like it. The audience stood up and clapped. Mom was crying with laughter. Dad filmed everything with his phone, although it was upside down. Even Beto laughed. The principal gave me back the rabbit. \"This is the best trick I have ever seen,\" he said. \"The rabbit really did disappear... on my head!\" We won first prize: a certificate and a bag of cookies. Crouton ate the cookies and also the certificate, but I will tell you about that another day. Danny's notebook: bad luck, ten. Fun, one hundred."
+        },
+        tasks: [
+          task("retell",
+            { es: "¿Cómo termina la historia?", en: "How does the story end?" },
+            { es: ["Dani y Croqueta ganan el primer premio", "El concurso se cancela", "Dani se va llorando", "Croqueta se pierde"], en: ["Danny and Crouton win first prize", "The show is canceled", "Danny leaves crying", "Crouton gets lost"] }, 0),
+          task("vocab",
+            { es: "¿Qué es una «reverencia»?", en: "What is a \"bow\"?" },
+            { es: ["Inclinarse hacia delante para saludar", "Un salto muy alto", "Una canción corta", "Una mala cara"], en: ["Leaning forward to say thanks", "A very high jump", "A short song", "A frown"] }, 0,
+            { word: { es: "reverencia", en: "bow" }, fact: { es: "Los artistas hacen una reverencia al final para dar las gracias.", en: "Performers take a bow at the end to say thank you." } })
+        ]
+      }
+    ]
+  });
   // @dani-stories
 
   CONTENT.worlds.push(mili, dani);

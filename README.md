@@ -7,6 +7,12 @@ Basada en [reading-treasure-quest](https://github.com/AllesSuper/reading-treasur
 ## Usar
 Abrir `index.html` en el navegador.
 
+## Perfiles y zona de padres
+Al abrir la app aparece **¿Quién juega?**, con un perfil por niño. Cada perfil guarda su propio progreso y sus ajustes (idioma, tamaño y tipo de letra, tema, sonido); el niño no cambia ajustes por su cuenta.
+- Los perfiles se crean en la **🔒 Zona de padres** (se entra resolviendo una multiplicación; es una barrera para niños pequeños, no seguridad real). Allí también se editan, se ve el informe de cada niño, se **borra el progreso** de un perfil (conserva sus ajustes), se **elimina** un perfil y se **borra todo**. Cada borrado pide confirmación.
+- El idioma es del perfil: un niño puede jugar en inglés y otro en español. La práctica en voz alta solo aparece en perfiles en español.
+- Máximo 8 perfiles. Los datos viven **solo en el dispositivo**: si se borran los datos del navegador, se pierden todos los perfiles.
+
 ## Práctica en voz alta (solo español, iPad/Safari)
 Botón **🗣️ Práctica en voz alta** en el mapa. La niña lee una historia frase por frase; la app la escucha y la corrige con suavidad (primero invita a releer; si falla otra vez, dice la palabra y ella la repite). Sin cronómetro; a los 10 minutos ofrece pausar y guardar.
 - En el iPad: Ajustes → Teclado → activar **Dictado**, y aceptar el permiso del micrófono la primera vez. Funciona sin internet.

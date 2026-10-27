@@ -52,3 +52,8 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 ## Preguntas abiertas
 - Variante del español para la voz.
 - Cómo hacer que el reconocimiento de voz funcione bien con niños y offline (a investigar).
+
+
+## Perfiles (hecho 2026-10-26)
+- [x] Perfiles por jugador con progreso y ajustes separados, idioma por perfil, zona de padres con candado y reseteo.
+- Siguiente: historias nuevas y más largas (sobre todo en inglés); orden/filtro de historias por nivel de cada perfil; respaldo/exportar perfiles; ajustes por perfil de cronómetro y comodines.

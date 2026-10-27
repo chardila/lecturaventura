@@ -13,6 +13,11 @@ Al abrir la app aparece **¿Quién juega?**, con un perfil por niño. Cada perfi
 - El idioma es del perfil: un niño puede jugar en inglés y otro en español. La práctica en voz alta solo aparece en perfiles en español.
 - Máximo 8 perfiles. Los datos viven **solo en el dispositivo**: si se borran los datos del navegador, se pierden todos los perfiles.
 
+## Historias largas
+Seis historias originales de ~10 minutos, en español e inglés, en dos series que se abren de una en una: **Mili y Nubi** (cuentos cortos de magia y amistad, para quien lee despacio) y **Dani Mala Pata** (humor en primera persona, más largas). Aparecen en la sección **Historias largas** del mapa. En la zona de padres, cada perfil tiene el ajuste **Historias que ve este jugador**: todas, solo las cortas o solo las largas.
+- Están en `src/stories-long.js`; para añadir una, se agrega otra historia al mundo (`mili.stories.push(...)` o `dani.stories.push(...)`) y `tests/long-stories.test.js` comprueba largo, frases cortas, tono y preguntas.
+- Diseño: `docs/superpowers/specs/2026-10-27-historias-largas-design.md`; plan: `docs/superpowers/plans/2026-10-27-historias-largas.md`.
+
 ## Práctica en voz alta (solo español, iPad/Safari)
 Botón **🗣️ Práctica en voz alta** en el mapa. La niña lee una historia frase por frase; la app la escucha y la corrige con suavidad (primero invita a releer; si falla otra vez, dice la palabra y ella la repite). Sin cronómetro; a los 10 minutos ofrece pausar y guardar.
 - En el iPad: Ajustes → Teclado → activar **Dictado**, y aceptar el permiso del micrófono la primera vez. Funciona sin internet.
@@ -21,8 +26,8 @@ Botón **🗣️ Práctica en voz alta** en el mapa. La niña lee una historia f
 - Diseño: `docs/superpowers/specs/`; plan: `docs/superpowers/plans/`.
 
 ## Desarrollo
-- Pruebas de la lógica pura: `node --test tests/*.test.js` (`src/practice.js`, `src/recognizer.js`).
+- Pruebas de la lógica pura: `node --test tests/*.test.js` (`src/practice.js`, `src/recognizer.js`, `src/profiles.js`, `src/library.js` y el contenido de las historias largas).
 - `src/content.js`: textos de la interfaz e historias (es/en).
 - `src/app.js`: lógica. `src/styles.css`, `src/shell.html`: diseño y estructura.
 - Después de editar `src/`: `bash build.sh` regenera `index.html`.
-- Un mundo aparece en un idioma solo si sus historias tienen texto en ese idioma. Hoy ambos idiomas tienen los 5 mundos (15 historias).
+- Un mundo aparece en un idioma solo si sus historias tienen texto en ese idioma. Hoy ambos idiomas tienen los 5 mundos (15 historias) más las 6 historias largas.

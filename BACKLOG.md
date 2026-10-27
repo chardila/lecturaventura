@@ -56,4 +56,8 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 
 ## Perfiles (hecho 2026-10-26)
 - [x] Perfiles por jugador con progreso y ajustes separados, idioma por perfil, zona de padres con candado y reseteo.
-- Siguiente: historias nuevas y más largas (sobre todo en inglés); orden/filtro de historias por nivel de cada perfil; respaldo/exportar perfiles.
+- Siguiente: orden/filtro de historias por nivel de cada perfil; respaldo/exportar perfiles.
+
+## Historias largas (hecho 2026-10-27)
+- [x] 6 historias originales (Mili y Nubi, Dani Mala Pata) en es/en, con ajuste por perfil (todas/cortas/largas) y serie que se abre en orden.
+- Pendiente: probar con los niños (largo real, tono, chistes en inglés) y ajustar; más historias si funcionan; práctica en inglés; audio modelo.

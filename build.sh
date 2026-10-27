@@ -22,6 +22,7 @@ OUT=index.html
   cat src/shell.html
   echo '<script>'
   cat src/content.js
+  cat src/stories-long.js
   cat src/practice.js
   cat src/recognizer.js
   cat src/profiles.js

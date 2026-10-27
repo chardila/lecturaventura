@@ -24,6 +24,7 @@ OUT=index.html
   cat src/content.js
   cat src/practice.js
   cat src/recognizer.js
+  cat src/profiles.js
   cat src/app.js
   echo '</script>'
   echo '</body>'

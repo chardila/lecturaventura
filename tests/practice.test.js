@@ -167,3 +167,17 @@ test("syllabify", function () {
   assert.deepEqual(Practice.syllabify("xyz"), ["xyz"]);
   assert.deepEqual(Practice.syllabify(""), []);
 });
+
+test("Recognizer", function () {
+  var Recognizer = require("../src/recognizer.js");
+  assert.equal(Recognizer.mapError("not-allowed"), "not-allowed");
+  assert.equal(Recognizer.mapError("service-not-allowed"), "not-allowed");
+  assert.equal(Recognizer.mapError("no-speech"), "no-speech");
+  assert.equal(Recognizer.mapError("aborted"), "aborted");
+  assert.equal(Recognizer.mapError("audio-capture"), "other");
+  assert.equal(Recognizer.isSupported(), false);
+  var fake = { start: function () {}, stop: function () {} };
+  Recognizer.setFactory(function () { return fake; });
+  assert.equal(Recognizer.create({}), fake);
+  Recognizer.setFactory(null);
+});

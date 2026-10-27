@@ -23,6 +23,7 @@ OUT=index.html
   echo '<script>'
   cat src/content.js
   cat src/practice.js
+  cat src/recognizer.js
   cat src/app.js
   echo '</script>'
   echo '</body>'

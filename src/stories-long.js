@@ -396,6 +396,105 @@
       }
     ]
   });
+  dani.stories.push({
+    id: "dani-3",
+    level: 2,
+    wpm: 100,
+    title: { es: "El campamento en el patio", en: "Backyard Camping" },
+    intro: {
+      es: "Dani promete a Beto la mejor noche de campamento.",
+      en: "Danny promises Beto the best camping night ever."
+    },
+    sections: [
+      {
+        text: {
+          es: "Cuaderno de Dani. Sábado. Hoy hice una promesa muy grande. Le dije a Beto: «Esta noche haremos el mejor campamento de la historia». Será en el patio de mi casa, porque el bosque queda lejos. Mamá dijo que sí con tres condiciones. Uno: nada de fuego. Dos: todos con pijama abrigada. Tres: si alguien se asusta, entramos a la casa. Papá me prestó su vieja carpa inflable. Es verde, enorme y huele a viaje. Hice una lista en mi cuaderno: carpa, linterna, bolsas de dormir, sándwiches y malvaviscos. Lola quiso venir. Dijo que ya era grande, porque tiene cuatro años y medio. Croqueta, por supuesto, iba a venir también. Beto llegó a las cuatro con una mochila gigante. Dijo que traía lo necesario: una brújula, una lupa y medias de repuesto. Nunca se sabe.",
+          en: "Danny's notebook. Saturday. Today I made a very big promise. I told Beto: \"Tonight we will have the best camping trip in history.\" It will be in my backyard, because the forest is far away. Mom said yes with three rules. One: no fire. Two: everybody wears warm pajamas. Three: if anyone gets scared, we go inside the house. Dad lent me his old inflatable tent. It is green, huge and smells like travel. I made a list in my notebook: tent, flashlight, sleeping bags, sandwiches and marshmallows. Lola wanted to come. She said she was big now, because she is four and a half. Crouton, of course, was coming too. Beto arrived at four o'clock with a giant backpack. He said he brought what we needed: a compass, a magnifying glass and spare socks. You never know."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Dónde será el campamento?", en: "Where will the camping trip be?" },
+            { es: ["En el patio de la casa de Dani", "En un bosque lejano", "En la playa", "En el colegio"], en: ["In Danny's backyard", "In a faraway forest", "At the beach", "At school"] }, 0),
+          task("vocab",
+            { es: "¿Qué es una «carpa»?", en: "What is a \"tent\"?" },
+            { es: ["Una casita de tela para dormir afuera", "Un tipo de pez", "Una mochila grande", "Una linterna"], en: ["A little cloth house for sleeping outside", "A kind of fish", "A big backpack", "A flashlight"] }, 0,
+            { word: { es: "carpa", en: "tent" }, fact: { es: "Las carpas se arman con varillas y cuerdas, o con aire.", en: "Tents are put up with poles and ropes, or with air." } })
+        ]
+      },
+      {
+        text: {
+          es: "A las cinco empezamos a armar la carpa. Beto leyó las instrucciones. Yo apreté el botón del inflador. La carpa empezó a crecer, lenta y lenta, como un gigante verde que despierta. Pero se infló torcida y quedó con la puerta mirando al cielo. Beto dijo que era una carpa moderna. Lola dijo que parecía un dinosaurio dormido. La enderezamos entre los tres, con mucha ayuda de Croqueta, que mordió una cuerda y se la llevó. Al final quedó casi derecha. Metimos adentro las bolsas de dormir, las linternas y los sándwiches. Cuando mamá miró desde la ventana de la cocina, nos hizo un pulgar arriba. Yo dije: «Qué buen campamento». Beto respondió: «Todavía no empezó». Croqueta se acostó en medio de la carpa y la dejó todavía más torcida. Lola le puso un nombre a la carpa: Dino.",
+          en: "At five o'clock we began to set up the tent. Beto read the instructions. I pressed the button on the pump. The tent began to grow, slow and slower, like a green giant waking up. But it inflated crooked and its door ended up facing the sky. Beto said it was a modern tent. Lola said it looked like a sleeping dinosaur. We straightened it together, with lots of help from Crouton, who bit a rope and ran off with it. In the end it stood almost straight. We put the sleeping bags, flashlights and sandwiches inside. When Mom looked out of the kitchen window, she gave us a thumbs up. I said: \"What a great camping trip.\" Beto answered: \"It has not even started yet.\" Crouton lay down in the middle of the tent and made it even more crooked. Lola gave the tent a name: Dino."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Cómo parecía la carpa, según Lola?", en: "What did the tent look like, according to Lola?" },
+            { es: ["Un dinosaurio dormido", "Un barco grande", "Una montaña", "Un globo de colores"], en: ["A sleeping dinosaur", "A big boat", "A mountain", "A colorful balloon"] }, 0),
+          task("predict",
+            { es: "¿Qué crees que pasará cuando oscurezca?", en: "What do you think will happen when it gets dark?" },
+            { es: ["Se oirán ruidos misteriosos", "Aparecerán dinosaurios de verdad", "Se acabará la noche enseguida", "Nadie podrá dormir por el calor"], en: ["They will hear mysterious sounds", "Real dinosaurs will show up", "The night will end right away", "Nobody will sleep because of the heat"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Cuando oscureció, nos metimos en la carpa. Cenamos sándwiches con la luz de las linternas. Beto contó un chiste. Lola contó otro. Yo no entendí ninguno, pero nos reímos igual. Beto prometió no tener miedo. Lo prometió tres veces. Lola sacó galletas escondidas en su bolsillo. Afuera cantaban los grillos y la luna salió grande y amarilla. Todo estaba tranquilo, hasta que de pronto oímos: ssssss. Nos miramos. «¿Qué fue eso?», susurró Beto. Ssssss, repitió el sonido. Venía de arriba. Y después, desde afuera: ñam, ñam, ñam. Lola agarró su osito. Croqueta levantó las orejas. Yo sentí cosquillas en la barriga. «Tranquilos», dije con una voz que sonó más aguda de lo normal. «Voy a ver qué es». Tomé una cuchara de madera, que fue lo primero que encontré, y salí de la carpa.",
+          en: "When it got dark, we went into the tent. We ate sandwiches by flashlight. Beto told a joke. Lola told another. I did not understand either one, but we laughed anyway. Beto promised not to be scared. He promised three times. Lola took out cookies hidden in her pocket. Outside, the crickets were singing and the moon came out big and yellow. Everything was calm, until suddenly we heard: ssssss. We looked at each other. \"What was that?\" whispered Beto. Ssssss, the sound said again. It came from above. And then, from outside: nom, nom, nom. Lola grabbed her teddy bear. Crouton perked up his ears. I felt a tickle in my belly. \"Stay calm,\" I said in a voice that came out higher than usual. \"I will go see what it is.\" I grabbed a wooden spoon, the first thing I found, and went out of the tent."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué arma agarra Dani para salir?", en: "What does Danny grab before going out?" },
+            { es: ["Una cuchara de madera", "Una linterna gigante", "Un palo de escoba", "Una almohada"], en: ["A wooden spoon", "A giant flashlight", "A broomstick", "A pillow"] }, 0),
+          task("vocab",
+            { es: "¿Qué son los «grillos»?", en: "What are \"crickets\"?" },
+            { es: ["Insectos que cantan de noche", "Pájaros grandes", "Peces pequeños", "Ranas verdes"], en: ["Insects that sing at night", "Big birds", "Small fish", "Green frogs"] }, 0,
+            { word: { es: "grillos", en: "crickets" }, fact: { es: "Los grillos cantan frotando sus alas.", en: "Crickets sing by rubbing their wings." } })
+        ]
+      },
+      {
+        text: {
+          es: "Alumbré con mi linterna hacia el rincón del patio. Allí, junto a la cerca, había una figura enorme y peluda. Estaba de espaldas. Se movía y hacía ñam, ñam, ñam. Respiré hondo y grité: «¿Quién anda ahí?». La figura se dio la vuelta. Era Pelusa, la perra del vecino. Tenía la cabeza metida entre dos tablas de la cerca y la boca llena de mis sándwiches. Había olvidado uno sobre la mesa. Pelusa se quedó atascada un ratito más, y tuve que ayudarla a sacar la cabeza con mucho cuidado. Me miró con ojos de culpa y siguió masticando. No pude evitarlo. Me eché a reír, y mi risa despertó a Beto y a Lola. «¿Era un dragón?», preguntó Lola desde la carpa. «Peor», dije yo. «Era una perra con hambre».",
+          en: "I shone my flashlight toward the corner of the yard. There, next to the fence, was a huge, furry shape. It had its back to me. It was moving and going nom, nom, nom. I took a deep breath and shouted: \"Who is there?\" The shape turned around. It was Fluffy, the neighbor's dog. She had her head stuck between two boards of the fence and her mouth full of my sandwiches. I had forgotten one on the table. Fluffy stayed stuck a little longer, and I had to help her pull out her head very carefully. She looked at me with guilty eyes and kept chewing. I could not help it. I burst out laughing, and my laugh woke up Beto and Lola. \"Was it a dragon?\" asked Lola from the tent. \"Worse,\" I said. \"It was a hungry dog.\""
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Quién hacía el ruido de ñam, ñam, ñam?", en: "Who was making the nom, nom, nom sound?" },
+            { es: ["Pelusa, la perra del vecino", "Croqueta", "Lola", "Un oso"], en: ["Fluffy, the neighbor's dog", "Crouton", "Lola", "A bear"] }, 0),
+          task("sentence",
+            { es: "Pon la oración en el orden correcto.", en: "Put the sentence in the right order." },
+            { es: ["Pelusa se comió mis sándwiches.", "Sándwiches Pelusa mis comió se.", "Se mis Pelusa sándwiches comió.", "Comió Pelusa se sándwiches mis."], en: ["Fluffy ate my sandwiches.", "Sandwiches Fluffy my ate.", "My ate Fluffy sandwiches.", "Ate Fluffy sandwiches my."] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Todavía nos reíamos cuando volvió el ruido de arriba: ssssss. Era la carpa. Tenía un agujerito, chiquito, y se desinflaba poco a poco. El techo empezó a bajar sobre nuestras cabezas, lento, lento, como una sábana mojada. Beto trató de sostenerlo con la mano. Lola se escondió debajo de su bolsa de dormir y asomó solo la nariz. Yo me puse la almohada de sombrero. Y entonces, ¡tsss, tsss, tsss! El rociador del jardín del vecino se encendió de golpe. Lanzó chorros de agua por encima de la cerca, directo a la mitad de nuestra carpa. Llovía de un lado y estaba seco del otro. Beto levantó el dedo: «Es el campamento más raro del mundo». Y era verdad. Croqueta, empapado, se sacudió encima de todos nosotros.",
+          en: "We were still laughing when the sound came back from above: ssssss. It was the tent. It had a tiny hole, and it was slowly going flat. The roof began to sink onto our heads, slow, slow, like a wet sheet. Beto tried to hold it up with his hand. Lola hid under her sleeping bag and poked out only her nose. I put my pillow on my head like a hat. And then, tsss, tsss, tsss! The neighbor's garden sprinkler turned on all at once. It shot streams of water over the fence, straight at half of our tent. It was raining on one side and dry on the other. Beto raised a finger: \"This is the weirdest camping trip in the world.\" And it was true. Crouton, soaked, shook himself all over us."
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué hace que llueva sobre la mitad de la carpa?", en: "What makes it rain on half of the tent?" },
+            { es: ["El rociador del vecino", "Una nube de verdad", "Una manguera de Dani", "La lluvia de la tarde"], en: ["The neighbor's sprinkler", "A real cloud", "Danny's hose", "The afternoon rain"] }, 0),
+          task("predict",
+            { es: "¿Qué crees que hará mamá cuando los vea?", en: "What do you think Mom will do when she sees them?" },
+            { es: ["Los invitará a entrar a la casa", "Los dejará mojados toda la noche", "Se enojará muchísimo", "Llamará a los bomberos"], en: ["She will invite them inside the house", "She will leave them wet all night", "She will get very angry", "She will call the firefighters"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Mamá apareció con una toalla en cada mano. «Muy bien, exploradores», dijo. «Es hora de entrar». Nos secó uno por uno, a Croqueta último. Beto colgó sus medias mojadas de una linterna. Parecían banderas. Lola preguntó si la carpa Dino se podía arreglar. Mamá dijo que con un parche quedaría como nueva. En la sala armamos una carpa de sábanas con dos sillas y el sofá. Quedó mejor que la de verdad. Mamá nos dio malvaviscos en palitos y los dorró un poquito sobre la estufa, con mucho cuidado. Olían a dulce. Lola se comió siete. Nos acostamos todos en fila, adentro de la carpa de sábanas, con las linternas prendidas. Beto dijo: «Este es el mejor campamento de mi vida». Yo me puse rojo de orgullo. Había cumplido mi promesa, aunque no como la había imaginado. Cuaderno de Dani: mala suerte, tres veces. Pero si cuento la historia, no me sale mal ni una vez. Esa noche Croqueta roncó como un tractor, y Lola se durmió con un malvavisco en la mano.",
+          en: "Mom showed up with a towel in each hand. \"All right, explorers,\" she said. \"It is time to come in.\" She dried us off one by one, Crouton last. Beto hung his wet socks from a flashlight. They looked like flags. Lola asked if the tent called Dino could be fixed. Mom said that with a patch it would be good as new. In the living room we built a sheet tent with two chairs and the couch. It turned out better than the real one. Mom gave us marshmallows on sticks and toasted them a little over the stove, very carefully. They smelled sweet. Lola ate seven. We all lay in a row inside the sheet tent, with the flashlights on. Beto said: \"This is the best camping trip of my life.\" I turned red with pride. I had kept my promise, although not the way I had imagined. Danny's notebook: bad luck, three times. But when I tell the story, it does not go wrong even once. That night Crouton snored like a tractor, and Lola fell asleep with a marshmallow in her hand."
+        },
+        tasks: [
+          task("retell",
+            { es: "¿Cómo termina la noche de campamento?", en: "How does the camping night end?" },
+            { es: ["En una carpa de sábanas dentro de la casa", "En el bosque con un oso", "Con todos peleando", "En el patio bajo la lluvia"], en: ["In a sheet tent inside the house", "In the forest with a bear", "With everyone fighting", "In the yard in the rain"] }, 0),
+          task("missing",
+            { es: "¿Qué letra falta? MALV_VISCO", en: "Which letter is missing? MARSH_ALLOW" },
+            { es: ["A", "E", "O", "U"], en: ["M", "N", "P", "T"] }, 0,
+            { hint: { es: "Dilo despacio: mal-va-vis-co.", en: "Say the word slowly: marsh-mal-low." } })
+        ]
+      }
+    ]
+  });
   // @dani-stories
 
   CONTENT.worlds.push(mili, dani);

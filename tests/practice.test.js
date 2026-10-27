@@ -123,3 +123,47 @@ test("decideNext", function () {
   assert.equal(Practice.decideNext(1, none), "again");
   assert.equal(Practice.decideNext(2, none), "again");
 });
+
+test("métricas: wpm y pausa", function () {
+  assert.equal(Practice.wordsPerMinute(30, 30000), 60);
+  assert.equal(Practice.wordsPerMinute(10, 0), 0);
+  assert.equal(Practice.PAUSE_AFTER_MS, 600000);
+  assert.equal(Practice.shouldOfferPause(599999), false);
+  assert.equal(Practice.shouldOfferPause(600000), true);
+});
+
+test("palabras difíciles", function () {
+  var base = {};
+  assert.deepEqual(Practice.mergeDifficult(base, ["bahía", "bahía", "oruga"]), { bahía: 2, oruga: 1 });
+  assert.deepEqual(base, {});
+  assert.deepEqual(Practice.mergeDifficult({ oruga: 1 }, ["Oruga."]), { oruga: 2 });
+  assert.deepEqual(Practice.topDifficult({ bahía: 2, oruga: 1, mariposa: 1 }, 2), ["bahía", "mariposa"]);
+});
+
+test("isFluent", function () {
+  assert.equal(Practice.isFluent(2, 20), true);
+  assert.equal(Practice.isFluent(4, 20), true);
+  assert.equal(Practice.isFluent(5, 20), false);
+  assert.equal(Practice.isFluent(0, 0), false);
+});
+
+test("orden y desbloqueo de historias", function () {
+  function st(id, n) { return { id: id, sections: [{ text: { es: new Array(n + 1).join("a ").trim() } }] }; }
+  assert.deepEqual(Practice.orderStoriesByWords([st("x", 40), st("y", 10), st("z", 25)], "es"), ["y", "z", "x"]);
+  var ids = ["a", "b", "c", "d", "e"];
+  assert.deepEqual(Practice.unlockedStoryIds(ids, []), ["a", "b", "c"]);
+  assert.deepEqual(Practice.unlockedStoryIds(ids, ["a"]), ["a", "b", "c", "d"]);
+  assert.equal(Practice.unlockedStoryIds(ids, ["a", "a", "x"]).length, 4);
+});
+
+test("syllabify", function () {
+  var table = {
+    "bahía": ["ba", "hí", "a"], "mariposa": ["ma", "ri", "po", "sa"], "escondidas": ["es", "con", "di", "das"],
+    "estrella": ["es", "tre", "lla"], "perezoso": ["pe", "re", "zo", "so"], "cohete": ["co", "he", "te"],
+    "cueva": ["cue", "va"], "brújula": ["brú", "ju", "la"], "oruga": ["o", "ru", "ga"], "a": ["a"],
+    "queso": ["que", "so"], "guerra": ["gue", "rra"], "rey": ["rey"]
+  };
+  Object.keys(table).forEach(function (w) { assert.deepEqual(Practice.syllabify(w), table[w], w); });
+  assert.deepEqual(Practice.syllabify("xyz"), ["xyz"]);
+  assert.deepEqual(Practice.syllabify(""), []);
+});

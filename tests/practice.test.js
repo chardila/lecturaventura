@@ -52,3 +52,74 @@ test("normalizeWords", function () {
   assert.deepEqual(Practice.normalizeWords("—¡Ven, Mira! —grita Antón."), ["ven", "mira", "grita", "anton"]);
   assert.deepEqual(Practice.normalizeWords("El año"), ["el", "año"]);
 });
+
+test("phoneticKey: equivalentes y distintas", function () {
+  [["vaca", "baca"], ["casa", "caza"], ["hola", "ola"], ["calle", "caye"], ["queso", "keso"], ["gente", "jente"]]
+    .forEach(function (p) { assert.equal(Practice.phoneticKey(p[0]), Practice.phoneticKey(p[1]), p.join("/")); });
+  [["gato", "pato"], ["cama", "casa"], ["guerra", "jerra"]]
+    .forEach(function (p) { assert.notEqual(Practice.phoneticKey(p[0]), Practice.phoneticKey(p[1]), p.join("/")); });
+});
+
+var CAMA = "El gato duerme en la cama.";
+
+test("alignReading: lectura correcta", function () {
+  var r = Practice.alignReading(CAMA, "el gato duerme en la cama");
+  assert.equal(r.allOk, true);
+  assert.equal(r.words.length, 6);
+  assert.ok(r.words.every(function (w) { return w.ok; }));
+});
+
+test("alignReading: palabra omitida (las de ≤2 letras se perdonan)", function () {
+  var r = Practice.alignReading("La oruga come y come.", "la oruga come");
+  assert.equal(r.allOk, false);
+  assert.deepEqual(r.words[4], { text: "come.", ok: false });
+  assert.equal(r.words[3].ok, true);
+});
+
+test("alignReading: adivinar cama por casa se marca", function () {
+  var r = Practice.alignReading(CAMA, "el gato duerme en la casa");
+  assert.equal(r.allOk, false);
+  assert.equal(r.words[5].ok, false);
+  assert.equal(r.words.filter(function (w) { return !w.ok; }).length, 1);
+});
+
+test("alignReading: ruido del reconocedor en palabras largas", function () {
+  assert.equal(Practice.alignReading("Vio una estrella.", "vio una estrela").allOk, true);
+});
+
+test("alignReading: repeticiones y palabras extra", function () {
+  assert.equal(Practice.alignReading(CAMA, "el el gato gato duerme en la la cama").allOk, true);
+});
+
+test("alignReading: desorden", function () {
+  assert.equal(Practice.alignReading(CAMA, "cama la en duerme gato el").allOk, false);
+});
+
+test("alignReading: puntuación y diálogo", function () {
+  assert.equal(Practice.alignReading("—¡Ven, Mira! —grita Antón.", "ven mira grita anton").allOk, true);
+});
+
+test("alignReading: homófonos", function () {
+  assert.equal(Practice.alignReading("La casa es grande.", "la caza es grande").allOk, true);
+});
+
+test("alignReading: silencio", function () {
+  ["", "   "].forEach(function (h) {
+    var r = Practice.alignReading(CAMA, h);
+    assert.equal(r.unheard, true);
+    assert.equal(r.allOk, false);
+    assert.ok(r.words.every(function (w) { return !w.ok; }));
+  });
+});
+
+test("decideNext", function () {
+  var good = Practice.alignReading(CAMA, "el gato duerme en la cama");
+  var bad = Practice.alignReading(CAMA, "el gato duerme en la casa");
+  var none = Practice.alignReading(CAMA, "");
+  assert.equal(Practice.decideNext(1, good), "accept");
+  assert.equal(Practice.decideNext(1, bad), "reread");
+  assert.equal(Practice.decideNext(2, bad), "model");
+  assert.equal(Practice.decideNext(3, good), "accept");
+  assert.equal(Practice.decideNext(1, none), "again");
+  assert.equal(Practice.decideNext(2, none), "again");
+});

@@ -150,3 +150,33 @@ test("ajuste timers (cronómetro y comodines)", function () {
   assert.equal(p.timers, true);
   assert.equal(p.game.timers, undefined);
 });
+
+test("stories: perfil sin el campo toma all, inválido vuelve a all", function () {
+  var s = Profiles.parseStore(JSON.stringify({ version: 2, profiles: [prof()] }));
+  assert.equal(s.profiles[0].stories, "all");
+  var s2 = Profiles.parseStore(JSON.stringify({ version: 2, profiles: [prof({ stories: "x" })] }));
+  assert.equal(s2.profiles[0].stories, "all");
+});
+
+test("stories: updateProfile acepta all/short/long y rechaza otros", function () {
+  var store = Profiles.emptyStore();
+  var p = Profiles.addProfile(store, { name: "Ana", avatar: "🦊", lang: "es" }).profile;
+  assert.equal(p.stories, "all");
+  ["short", "long", "all"].forEach(function (v) {
+    assert.equal(Profiles.updateProfile(store, p.id, { stories: v }).ok, true);
+    assert.equal(p.stories, v);
+  });
+  assert.equal(Profiles.updateProfile(store, p.id, { stories: "x" }).error, "value");
+});
+
+test("stories: viaja en toState y applyState, no en game", function () {
+  var store = Profiles.emptyStore();
+  var p = Profiles.addProfile(store, { name: "Ana", avatar: "🦊", lang: "es" }).profile;
+  Profiles.updateProfile(store, p.id, { stories: "long" });
+  var st = Profiles.toState(p);
+  assert.equal(st.stories, "long");
+  st.stories = "short";
+  Profiles.applyState(p, st);
+  assert.equal(p.stories, "short");
+  assert.equal("stories" in p.game, false);
+});

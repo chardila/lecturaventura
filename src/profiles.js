@@ -9,12 +9,13 @@ var Profiles = (function () {
   var NAME_MAX = 20;
   var AVATARS = ["🦊", "🐙", "🐼", "🦁", "🐸", "🐵",
     "🦄", "🐢", "🐧", "🦉", "🐬", "🐝"];
-  var SETTING_KEYS = ["name", "avatar", "lang", "theme", "readScale", "readFont", "sound", "timers"];
+  var SETTING_KEYS = ["name", "avatar", "lang", "theme", "readScale", "readFont", "sound", "timers", "stories"];
   var LANGS = ["es", "en"];
   var CHOICES = {
     theme: ["light", "dark"],
     readScale: ["small", "normal", "large"],
-    readFont: ["standard", "dyslexia", "serif"]
+    readFont: ["standard", "dyslexia", "serif"],
+    stories: ["all", "short", "long"]
   };
 
   function emptyStore() { return { version: STORE_VERSION, lastLang: null, profiles: [] }; }
@@ -52,6 +53,7 @@ var Profiles = (function () {
       readFont: CHOICES.readFont.indexOf(p.readFont) >= 0 ? p.readFont : "standard",
       sound: typeof p.sound === "boolean" ? p.sound : true,
       timers: typeof p.timers === "boolean" ? p.timers : true,
+      stories: CHOICES.stories.indexOf(p.stories) >= 0 ? p.stories : "all",
       game: Object.assign(defaultGame(), isObj(p.game) ? p.game : {})
     };
   }
@@ -99,7 +101,7 @@ var Profiles = (function () {
     }
     var profile = {
       id: newId(store), name: checked.name, avatar: checked.avatar, lang: checked.lang,
-      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, game: defaultGame()
+      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, stories: "all", game: defaultGame()
     };
     store.profiles.push(profile);
     return { ok: true, profile: profile };

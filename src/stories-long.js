@@ -143,6 +143,62 @@
       }
     ]
   });
+  mili.stories.push({
+    id: "mili-3",
+    level: 1,
+    wpm: 50,
+    title: { es: "El regalo de Tomás", en: "Tommy's Present" },
+    intro: {
+      es: "Nubi quiere hacerle un regalo muy especial a Tomás.",
+      en: "Puff wants to give Tommy a very special present."
+    },
+    sections: [
+      {
+        text: {
+          es: "Hoy es el cumpleaños de Tomás. Hace mucho calor. Mili lleva un paquete con un lazo rojo. Nubi viaja en su mochila, bien calladita. En el patio de Tomás hay globos, música y un pastel grande. Los niños juegan con una manguera. Tomás lleva una corona de papel y se ve muy contento. Mili mira el paquete y sonríe. Pero Nubi está seria. Mira a todos los niños. Cada uno trajo algo para Tomás. Ella no tiene un regalo. Se pone un poco gris y suspira: puf. Mili le da un abrazo suave. «No te preocupes, Nubi», dice Mili. «Seguro se te ocurre algo bonito».",
+          en: "Today is Tommy's birthday. It is very hot. Millie carries a package with a red bow. Puff rides in her backpack, very quiet. In Tommy's yard there are balloons, music and a big cake. The kids play with a hose. Tommy wears a paper crown and looks very happy. Millie looks at the package and smiles. But Puff looks serious. It watches all the kids. Each one brought something for Tommy. It does not have a present. It turns a little gray and sighs: puff. Millie gives it a soft hug. \"Do not worry, Puff,\" says Millie. \"You will think of something nice.\""
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Por qué está seria Nubi?", en: "Why does Puff look serious?" },
+            { es: ["Porque no tiene un regalo", "Porque tiene sueño", "Porque no le gusta la música", "Porque quiere irse a casa"], en: ["Because it has no present", "Because it is sleepy", "Because it does not like the music", "Because it wants to go home"] }, 0),
+          task("vocab",
+            { es: "¿Qué quiere decir «manguera»?", en: "What does \"hose\" mean?" },
+            { es: ["Un tubo largo para echar agua", "Un tipo de globo", "Una bolsa de dulces", "Un juego de mesa"], en: ["A long tube that sprays water", "A kind of balloon", "A bag of candy", "A board game"] }, 0,
+            { word: { es: "manguera", en: "hose" }, fact: { es: "Con una manguera se riegan las plantas y se juega en verano.", en: "A hose waters the plants and is fun in summer." } })
+        ]
+      },
+      {
+        text: {
+          es: "Llega la hora del pastel. Todos cantan el cumpleaños feliz. Nubi vuela sobre la mesa y mira el pastel. ¡Ya sabe qué hacer! Se pone muy blanca y muy fría. Sopla con suavidad: fuuu. Sobre el pastel empiezan a caer copitos de nieve. Son rojos, azules, amarillos y verdes. Brillan como confeti. Mili abre mucho los ojos. Nubi sonríe con sus ojitos. Nadie dice nada. Los niños miran con la boca abierta. Tomás se queda quieto un momento. Luego sonríe de oreja a oreja. «Es nieve de colores», susurra. «¡En pleno verano!»",
+          en: "It is time for the cake. Everyone sings happy birthday. Puff flies over the table and looks at the cake. Now it knows what to do! It turns very white and very cold. It blows gently: whoo. Little snowflakes begin to fall on the cake. They are red, blue, yellow and green. They shine like confetti. Millie opens her eyes wide. Puff smiles with its little eyes. Nobody says a word. The kids watch with open mouths. Tommy stands still for a moment. Then he smiles from ear to ear. \"It is colorful snow,\" he whispers. \"In the middle of summer!\""
+        },
+        tasks: [
+          task("quiz",
+            { es: "¿Qué cae sobre el pastel?", en: "What falls on the cake?" },
+            { es: ["Copitos de nieve de colores", "Gotas de lluvia", "Hojas secas", "Migas de pan"], en: ["Colorful snowflakes", "Raindrops", "Dry leaves", "Bread crumbs"] }, 0),
+          task("predict",
+            { es: "¿Qué crees que hará Tomás con la nieve?", en: "What do you think Tommy will do with the snow?" },
+            { es: ["Pedirá un deseo", "Se pondrá a llorar", "Llamará a su mamá", "Guardará la nieve en el bolsillo"], en: ["He will make a wish", "He will start to cry", "He will call his mom", "He will keep the snow in his pocket"] }, 0)
+        ]
+      },
+      {
+        text: {
+          es: "Tomás cierra los ojos y pide un deseo. Después sopla las velas. ¡Plaf! La nieve se vuelve helado de fresa, de limón y de uva. Los niños aplauden y gritan de alegría. Cada uno recibe un pedazo de pastel con helado de colores. Hace calor, pero nadie tiene calor. La abuela Rosa también prueba el helado. «Qué sabor tan raro y tan rico», dice. Tomás abraza a Nubi y le da las gracias. «Es el mejor regalo del mundo», dice. Nubi se pone rosa y hace un corazón. Mili ríe. Su paquete con lazo rojo era un libro. Pero esta tarde el regalo más bonito fue Nubi. Mili y Nubi vuelven a casa felices, con las mejillas frías.",
+          en: "Tommy closes his eyes and makes a wish. Then he blows out the candles. Poof! The snow turns into strawberry, lemon and grape ice cream. The kids clap and cheer with joy. Each one gets a piece of cake with colorful ice cream. It is hot, but nobody feels hot. Grandma Rosa tries the ice cream too. \"What a strange and tasty flavor,\" she says. Tommy hugs Puff and thanks it. \"It is the best present in the world,\" he says. Puff turns pink and makes a heart. Millie laughs. Her package with the red bow was a book. But this afternoon the nicest present was Puff. Millie and Puff walk home happy, with cold cheeks."
+        },
+        tasks: [
+          task("retell",
+            { es: "¿Cómo termina la historia?", en: "How does the story end?" },
+            { es: ["La nieve se vuelve helado y todos lo disfrutan", "El pastel se derrite y se pierde", "Nubi se va sola a su casa", "Tomás se enoja con Mili"], en: ["The snow turns into ice cream and everyone enjoys it", "The cake melts and is lost", "Puff goes home alone", "Tommy gets upset with Millie"] }, 0),
+          task("vocab",
+            { es: "¿Qué quiere decir «deseo»?", en: "What does \"wish\" mean?" },
+            { es: ["Algo que quieres que pase", "Un tipo de pastel", "Un juego de cartas", "Un baile"], en: ["Something you hope will happen", "A kind of cake", "A card game", "A dance"] }, 0,
+            { word: { es: "deseo", en: "wish" }, fact: { es: "Al soplar las velas de cumpleaños se pide un deseo.", en: "People make a wish when they blow out birthday candles." } })
+        ]
+      }
+    ]
+  });
   // @mili-stories
 
   // @dani-stories

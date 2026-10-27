@@ -194,6 +194,7 @@ var Practice = (function () {
   var api = {
     splitSentences: splitSentences,
     normalizeWords: normalizeWords,
+    cleanWord: cleanWord,
     phoneticKey: phoneticKey,
     alignReading: alignReading,
     decideNext: decideNext,

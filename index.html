@@ -313,6 +313,18 @@ p { margin: 0 0 .8em; }
 [data-theme="dark"] .mc.hot  { background: #3a2418; }
 @keyframes detbeep { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @media (prefers-reduced-motion: reduce) { .mc.hot { animation: none; } }
+
+/* 6. Práctica en voz alta ------------------------------------ */
+.practice-sentence { font-family: var(--font-read); font-size: calc(2rem * var(--read-scale)); line-height: 1.6; text-align: center; margin: 22px 0; }
+.practice-sentence .pw { display: inline-block; padding: 0 6px; margin: 0 1px; border-radius: 8px; transition: background .15s; }
+.practice-sentence .pw.lit { background: #ffe08a; color: #2a2118; }
+.practice-sentence .pw.ok { color: #1c7a52; }
+.practice-sentence .pw.doubt { background: #ffd9a8; color: #2a2118; }
+[data-theme="dark"] .practice-sentence .pw.ok { color: #7be3b4; }
+.practice-msg { text-align: center; min-height: 3rem; font-size: 1.2rem; margin: 8px 0 14px; }
+.practice-big { font-size: 2.6rem; font-weight: 700; text-align: center; margin: 10px 0; }
+.practice-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.practice-actions .btn.big { width: auto; min-width: 200px; }
 </style>
 </head>
 <body>
@@ -373,6 +385,31 @@ const UI = {
     locked: "Aún bloqueado",
     unlockAt: "Se abre con {n} ⭐",
     stories: "Historias",
+    practiceTitle: "Práctica en voz alta",
+    practiceIntro: "Lee en voz alta, frase por frase. ¡Yo te escucho!",
+    practiceRead: "🎤 Leer",
+    practiceHear: "🔊 Oír la frase",
+    practiceListening: "Te escucho…",
+    practicePraise: ["¡Muy bien leído!", "¡Qué bien suena!", "¡Excelente lectura!"],
+    practiceReread: "Casi. Mira otra vez las palabras marcadas y léelas despacio.",
+    practiceModel: "Escucha y repite:",
+    practiceNoHear: "No te escuché. Inténtalo otra vez.",
+    practiceUnsupported: "Este dispositivo todavía no puede escucharte. Puedes oír cada frase y leerla en voz alta con un adulto.",
+    practiceDenied: "Necesito permiso para usar el micrófono. Pídele a un adulto que lo active.",
+    practiceAdultNext: "Ya la leímos →",
+    practicePause: "¡Buen trabajo! Llevas 10 minutos.",
+    practicePauseSave: "Guardar y seguir después",
+    practicePauseGo: "Seguir un rato más",
+    practiceResume: "Seguir donde iba",
+    practiceReviewTitle: "Palabras para repasar",
+    practiceReviewIntro: "Léelas despacio, por partes y luego completas.",
+    practiceReviewDone: "¡Listo! Repasaste tus palabras.",
+    practiceReviewBtn: "Repasar palabras",
+    practiceLocked: "Lee bien una historia para abrir la siguiente",
+    parentPractice: "Práctica en voz alta",
+    parentWpm: "Palabras por minuto",
+    parentHelped: "Palabras con ayuda",
+    parentLastSessions: "Últimas prácticas",
     chooseStory: "Elige una historia",
     minutes: "min",
     readTime: "Tiempo de lectura",
@@ -3233,6 +3270,7 @@ var Practice = (function () {
   var api = {
     splitSentences: splitSentences,
     normalizeWords: normalizeWords,
+    cleanWord: cleanWord,
     phoneticKey: phoneticKey,
     alignReading: alignReading,
     decideNext: decideNext,
@@ -3262,7 +3300,7 @@ var Recognizer = (function () {
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   }
 
-  function isSupported() { return !!ctor(); }
+  function isSupported() { return !!factory || !!ctor(); }
 
   function mapError(code) {
     if (code === "not-allowed" || code === "service-not-allowed") return "not-allowed";
@@ -3351,7 +3389,8 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
       byType: { comprehension: { c: 0, n: 0 }, spelling: { c: 0, n: 0 }, vocab: { c: 0, n: 0 } } },
     history: [],
     mission: { day: null, read: false, correct: 0, finished: false },
-    week: { id: null, count: 0 }
+    week: { id: null, count: 0 },
+    practice: { sessions: [], difficult: {}, fluentDone: [], resume: null }
   };
   var state = load();
   var session = null;
@@ -3470,6 +3509,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
      SCREEN-ROUTING
      ============================================================ */
   function show(id) {
+    stopPracticeListening();
     var screens = document.querySelectorAll(".screen");
     for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
     var target = document.getElementById(id);
@@ -3530,7 +3570,8 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     // Welten-Karte
     html += '<section><div class="sec-head"><h2 style="margin:0">' + t("map") + ' \uD83D\uDDFA\ufe0f</h2>' +
       '<button class="btn ghost" data-act="discover">\uD83D\uDD2D ' + t("discover") + '</button>' +
-      '<button class="btn ghost" data-act="collection">\uD83D\uDCD5 ' + t("collection") + '</button></div>';
+      '<button class="btn ghost" data-act="collection">\uD83D\uDCD5 ' + t("collection") + '</button>' +
+      (state.lang === "es" ? '<button class="btn ghost" data-act="practice">\uD83D\uDDE3\uFE0F ' + t("practiceTitle") + '</button>' : '') + '</div>';
     html += '<div class="map grid cards">';
     worlds().forEach(function (world) {
       var unlocked = state.stars >= world.unlockStars;
@@ -3622,6 +3663,11 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     show("screen-session");
   }
 
+  function timerHtml() {                    // en la práctica en voz alta no hay cronómetro visible
+    return session && session.mode === "practice" ? "" :
+      '<div class="timer" id="timer"><span>\u23f1\ufe0f</span><span class="ring">0:00</span></div>';
+  }
+
   function startTimer() {
     stopTimer();
     session.timer = setInterval(function () {
@@ -3661,7 +3707,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     var html = '<div class="sec-head">' +
       '<button class="icon-btn" data-act="quit">\u2715</button>' +
       '<div class="bar" title="' + t("progress") + '"><span style="width:' + progress + '%"></span></div>' +
-      '<div class="timer" id="timer"><span>\u23f1\ufe0f</span><span class="ring">0:00</span></div>' +
+      timerHtml() +
       '</div>';
 
     // Lese-Karte mit anklickbaren Vokabeln
@@ -3714,7 +3760,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     var html = '<div class="sec-head">' +
       '<button class="icon-btn" data-act="quit">\u2715</button>' +
       '<div class="bar"><span style="width:' + (((session.si + (session.ti+1)/(tasks.length+1)) / total) * 100) + '%"></span></div>' +
-      '<div class="timer" id="timer"><span>\u23f1\ufe0f</span><span class="ring">0:00</span></div>' +
+      timerHtml() +
       '</div>';
 
     html += '<div class="read-card"><p class="eyebrow">' + taskBadge(task.type) + '</p>' +
@@ -3761,7 +3807,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     var html = '<div class="sec-head">' +
       '<button class="icon-btn" data-act="quit">\u2715</button>' +
       '<div class="bar"><span style="width:' + (((session.si + (session.ti + 1) / (tasks.length + 1)) / total) * 100) + '%"></span></div>' +
-      '<div class="timer" id="timer"><span>\u23f1\ufe0f</span><span class="ring">0:00</span></div>' +
+      timerHtml() +
       '</div>';
     html += '<div class="read-card"><p class="eyebrow">' + taskBadge("detector") + '</p>' +
       '<h2>' + loc(task.q) + '</h2><p class="muted">' + t("detectorSweep") + '</p>';
@@ -3870,17 +3916,19 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
   function nextSection() {
     // Abschnitt geschafft -> Belohnung
     session.coins += COINS_SECTION;
-    session.words += countWords(loc(session.story.sections[session.si].text));
+    if (session.mode !== "practice") session.words += countWords(loc(session.story.sections[session.si].text));
     state.mission.read = true;
     session.si++;
     if (session.si >= session.story.sections.length) { finishSession(); return; }
     session.ti = 0; session.phase = "read";
+    if (session.mode === "practice") { session.sn = 0; session.attempt = 0; loadSents(); renderPracticeSentence(); return; }
     renderSection();
   }
 
   /* ---------- Session-Abschluss ---------- */
   function finishSession() {
     stopTimer();
+    if (session.mode === "practice") session.elapsed = Math.round(session.readMs / 1000);
     // Sterne aus Trefferquote (0–3) + evtl. Bonus
     var rate = session.answered ? session.correct / session.answered : 0;
     var earnedStars = rate >= 0.9 ? 3 : rate >= 0.6 ? 2 : 1;
@@ -3905,6 +3953,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     state.lastPlayed = todayKey();
     state.week.count++;
 
+    if (session.mode === "practice") finishPracticeBookkeeping();
     var beforeLevel = state.level;
     var unlockedBefore = unlockedWorldIds();
     addStars(earnedStars);
@@ -3932,6 +3981,10 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
       var nw = findWorld(id);
       html += '<p class="eyebrow pulse">\uD83D\uDDFA\ufe0f ' + t("worldUnlocked") + ' ' + nw.emoji + ' ' + loc(nw.name) + '</p>';
     });
+    if (session.mode === "practice") {
+      html += '<p class="muted">' + t("parentWpm") + ': ' + Practice.wordsPerMinute(session.words, session.readMs) + '</p>';
+      if (session.helped.length) html += '<div class="spacer"></div><button class="btn accent big" data-act="practice-review">\uD83D\uDD0A ' + t("practiceReviewBtn") + '</button>';
+    }
     html += '<div class="spacer"></div><button class="btn primary big" data-act="home">' + t("backMap") + '</button>';
     html += '<p class="muted" style="margin-top:14px">\uD83D\uDD25 ' + t("streak") + ': ' + state.streak + '</p>';
     html += '</div>';
@@ -3948,6 +4001,333 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     // Live-Anzeige von gesammelten Münzen/Sternen in der Session (nicht persistent)
     var who = document.querySelector(".hud");
     if (!who) return; // HUD ist im Session-Screen nicht vorhanden – bewusst reduziert
+  }
+
+  /* ============================================================
+     PRÁCTICA EN VOZ ALTA (solo español; ver docs/superpowers/specs)
+     ============================================================ */
+  var reviewState = null;
+
+  function allStories() {
+    var out = [];
+    worlds().forEach(function (w) { w.stories.forEach(function (s) { out.push(s); }); });
+    return out;
+  }
+  function ensurePractice() {
+    if (!state.practice || typeof state.practice !== "object") state.practice = {};
+    var p = state.practice;
+    if (!Array.isArray(p.sessions)) p.sessions = [];
+    if (!p.difficult || typeof p.difficult !== "object") p.difficult = {};
+    if (!Array.isArray(p.fluentDone)) p.fluentDone = [];
+    if (p.resume === undefined) p.resume = null;
+  }
+  function storyWordCount(story) {
+    var n = 0; story.sections.forEach(function (s) { n += countWords(loc(s.text)); }); return n;
+  }
+
+  function renderPracticeList() {
+    ensurePractice();
+    var stories = allStories(), byId = {};
+    stories.forEach(function (s) { byId[s.id] = s; });
+    var order = Practice.orderStoriesByWords(stories, "es");
+    var open = Practice.unlockedStoryIds(order, state.practice.fluentDone);
+    var html = hudHtml() +
+      '<div class="btn-row spacer"><button class="btn ghost" data-act="home">← ' + t("map") + '</button></div>' +
+      '<section><h1>🗣️ ' + t("practiceTitle") + '</h1><p class="muted">' + t("practiceIntro") + '</p>';
+    var res = state.practice.resume;
+    if (res && byId[res.storyId]) {
+      html += '<button class="card" data-practice-story="' + res.storyId + '" data-resume="1">' +
+        '<span class="emoji">▶️</span><h3>' + t("practiceResume") + '</h3>' +
+        '<p class="meta">' + loc(byId[res.storyId].title) + '</p></button><div class="spacer"></div>';
+    }
+    html += '<div class="grid cards">';
+    order.forEach(function (id) {
+      var st = byId[id], unlocked = open.indexOf(id) >= 0, info = findStory(id);
+      html += '<button class="card' + (unlocked ? "" : " locked") + '" data-practice-story="' + id + '"' +
+        (unlocked ? "" : ' data-practice-locked="1"') + '>' +
+        (unlocked ? "" : '<span class="lock">🔒</span>') +
+        '<span class="emoji">' + info.world.emoji + '</span>' +
+        '<h3>' + loc(st.title) + (state.finished[id] ? ' ⭐' : '') + '</h3>' +
+        '<p class="meta">' + storyWordCount(st) + ' ' + (state.lang === "en" ? "words" : "palabras") + '</p></button>';
+    });
+    html += '</div></section>';
+    $("#screen-world").innerHTML = html;
+  }
+
+  function loadSents() {
+    session.sents = Practice.splitSentences(loc(session.story.sections[session.si].text));
+  }
+  function startPractice(storyId, resume) {
+    var info = findStory(storyId);
+    if (!info) return;
+    stopPracticeListening();
+    session = {
+      world: info.world, story: info.story, mode: "practice",
+      si: 0, phase: "read", ti: 0, timeLeft: 0, jokers: 0,
+      correct: 0, answered: 0, coins: 0, stars: 0, words: 0,
+      adapt: 0, easyText: false, elapsed: 0, surpriseUsed: false, timer: null,
+      sents: [], sn: 0, sentDone: 0, attempt: 0, helped: [], rereads: 0, readMs: 0,
+      startedAt: Date.now(), pauseOffered: false, rec: null, listenStart: 0, modeling: null
+    };
+    session.sentTotal = 0;
+    info.story.sections.forEach(function (s) { session.sentTotal += Practice.splitSentences(loc(s.text)).length; });
+    if (resume && resume.storyId === storyId && resume.si < info.story.sections.length) {
+      ["si", "sn", "words", "readMs", "rereads", "correct", "answered", "sentDone"].forEach(function (k) {
+        if (typeof resume[k] === "number") session[k] = resume[k];
+      });
+      if (Array.isArray(resume.helped)) session.helped = resume.helped.slice();
+    }
+    loadSents();
+    renderPracticeSentence();
+    show("screen-session");
+  }
+
+  function practiceHead() {
+    var pct = session.sentTotal ? Math.round(session.sentDone / session.sentTotal * 100) : 0;
+    return '<div class="sec-head"><button class="icon-btn" data-act="quit">✕</button>' +
+      '<div class="bar" title="' + t("progress") + '"><span style="width:' + pct + '%"></span></div></div>';
+  }
+  function setMsg(html) { var m = $("#practice-msg"); if (m) m.innerHTML = html; }
+  function setHidden(sel, hide) { var x = $(sel); if (x) x.classList.toggle("hidden", !!hide); }
+  function randomPraise() { var a = t("practicePraise"); return a[Math.floor(Math.random() * a.length)]; }
+
+  function renderPracticeSentence() {
+    stopPracticeListening();
+    if (session.sn >= session.sents.length) { session.phase = "tasks"; session.ti = 0; renderTask(); return; }
+    var sent = session.sents[session.sn], supported = Recognizer.isSupported();
+    var words = sent.split(" ").map(function (wd) { return '<span class="pw">' + wd + '</span>'; }).join(" ");
+    var html = practiceHead() +
+      '<div class="read-card"><p class="eyebrow">' + session.world.emoji + ' ' + loc(session.story.title) +
+      ' · ' + (session.si + 1) + '/' + session.story.sections.length + '</p>' +
+      '<p class="practice-sentence" id="practice-sentence">' + words + '</p>' +
+      '<div class="practice-msg" id="practice-msg" role="status">' + (supported ? "" : t("practiceUnsupported")) + '</div>' +
+      '<div class="practice-actions">' +
+      (supported ? '<button class="btn primary big" id="practice-mic" data-act="practice-listen">' + t("practiceRead") + '</button>' : '') +
+      '<button class="btn ghost" id="practice-hear" data-act="practice-hear">' + t("practiceHear") + '</button>' +
+      '<button class="btn accent hidden" id="practice-next" data-act="practice-next">' + t("next") + ' →</button>' +
+      '<button class="btn ghost' + (supported ? " hidden" : "") + '" id="practice-adult" data-act="practice-adult-next">' + t("practiceAdultNext") + '</button>' +
+      '</div></div>';
+    $("#screen-session").innerHTML = html;
+  }
+
+  function stopPracticeListening() {
+    if (session && session.rec) { var r = session.rec; session.rec = null; try { r.stop(); } catch (e) {} }
+    if (reviewState && reviewState.rec) { var r2 = reviewState.rec; reviewState.rec = null; try { r2.stop(); } catch (e) {} }
+    if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  }
+
+  // Ilumina las palabras que ya se han oído mientras la niña lee (resultados parciales)
+  function lightWords(interim) {
+    if (!session || session.mode !== "practice" || session.modeling) return;
+    var r = Practice.alignReading(session.sents[session.sn], interim);
+    if (r.unheard) return;
+    var last = -1;
+    r.words.forEach(function (w, i) { if (w.ok && Practice.normalizeWords(w.text).join("").length > 2) last = i; });
+    var spans = document.querySelectorAll("#practice-sentence .pw");
+    r.words.forEach(function (w, i) { if (spans[i]) spans[i].classList.toggle("lit", i <= last && w.ok); });
+  }
+
+  function practiceListen() {
+    if (!session || session.mode !== "practice" || session.rec) return;      // doble toque
+    if (!Recognizer.isSupported()) { setMsg(t("practiceUnsupported")); setHidden("#practice-adult", false); return; }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    var mine = session, heard = "", got = false, err = null;
+    mine.listenStart = Date.now();
+    setMsg(t("practiceListening"));
+    var mic = $("#practice-mic"); if (mic) mic.classList.add("listening");
+    var rec = Recognizer.create({
+      lang: "es-CO",
+      onInterim: function (txt) { if (session === mine && mine.rec === rec) lightWords(txt); },
+      onFinal: function (txt) { got = true; heard = txt; },
+      onError: function (code) { err = Recognizer.mapError(code); },
+      onEnd: function () {
+        if (session !== mine || mine.rec !== rec) return;
+        mine.rec = null;
+        if (mic) mic.classList.remove("listening");
+        if (err === "not-allowed") { setMsg(t("practiceDenied")); setHidden("#practice-adult", false); return; }
+        if (mine.modeling) onModelResult(got ? heard : "");
+        else onPracticeResult(got ? heard : "");
+      }
+    });
+    mine.rec = rec;
+    rec.start();
+  }
+
+  function markWords(r) {
+    var spans = document.querySelectorAll("#practice-sentence .pw");
+    r.words.forEach(function (w, i) {
+      if (!spans[i]) return;
+      spans[i].classList.remove("lit");
+      spans[i].classList.toggle("ok", w.ok);
+      spans[i].classList.toggle("doubt", !w.ok);
+    });
+  }
+  function clearMarks() {
+    var spans = document.querySelectorAll("#practice-sentence .pw");
+    for (var i = 0; i < spans.length; i++) spans[i].className = "pw";
+  }
+
+  function onPracticeResult(heardText) {
+    var sent = session.sents[session.sn];
+    var r = Practice.alignReading(sent, heardText);
+    var act = Practice.decideNext(session.attempt + 1, r);
+    if (act === "again") { clearMarks(); setMsg(t("practiceNoHear")); return; }
+    session.readMs += Date.now() - session.listenStart;
+    markWords(r);
+    if (act === "accept") { completeSentence(); return; }
+    if (act === "reread") {
+      session.attempt++; session.rereads++;
+      setMsg(t("practiceReread"));
+      return;
+    }
+    startModeling(r);
+  }
+
+  function completeSentence() {
+    session.words += Practice.normalizeWords(session.sents[session.sn]).length;
+    session.sentDone++;
+    session.modeling = null;
+    setMsg('🌟 ' + randomPraise());
+    setHidden("#practice-mic", true); setHidden("#practice-adult", true);
+    setHidden("#practice-next", false);
+    ding(true);
+  }
+
+  function startModeling(r) {
+    var words = [];
+    r.words.forEach(function (w) {
+      var c = Practice.cleanWord(w.text);
+      if (!w.ok && c && words.indexOf(c) < 0) words.push(c);
+    });
+    session.modeling = { words: words, i: 0, tries: 0 };
+    renderPracticeModel(words, 0);
+  }
+  function renderPracticeModel(words, i) {
+    session.modeling.i = i; session.modeling.tries = 0;
+    setMsg(t("practiceModel") + '<div class="practice-big">' + words[i] + '</div>');
+    setHidden("#practice-adult", false);
+    speak(words[i]);
+  }
+  function onModelResult(heardText) {
+    var m = session.modeling, word = m.words[m.i];
+    if (!heardText.trim()) { setMsg(t("practiceNoHear")); return; }
+    m.tries++;
+    var ok = Practice.alignReading(word, heardText).allOk;
+    if (ok || m.tries >= 2) { modelAdvance(); return; }
+    setMsg(t("practiceModel") + '<div class="practice-big">' + word + '</div>');
+    speak(word);
+  }
+  function modelAdvance() {
+    var m = session.modeling;
+    if (m.i + 1 < m.words.length) { renderPracticeModel(m.words, m.i + 1); return; }
+    session.helped = session.helped.concat(m.words);
+    completeSentence();
+  }
+
+  function practiceNext() {
+    session.sn++; session.attempt = 0; session.modeling = null;
+    var lastSection = session.si === session.story.sections.length - 1;
+    if (!session.pauseOffered && Practice.shouldOfferPause(Date.now() - session.startedAt) &&
+        !(lastSection && session.sn >= session.sents.length)) {
+      session.pauseOffered = true;
+      renderPracticePause();
+      return;
+    }
+    renderPracticeSentence();
+  }
+  function renderPracticePause() {
+    stopPracticeListening();
+    $("#screen-session").innerHTML = practiceHead() +
+      '<div class="read-card" style="text-align:center"><div style="font-size:4rem">🌟</div>' +
+      '<h2>' + t("practicePause") + '</h2><div class="spacer"></div>' +
+      '<div class="practice-actions"><button class="btn primary big" data-act="practice-pause-save">' + t("practicePauseSave") + '</button>' +
+      '<button class="btn ghost" data-act="practice-pause-go">' + t("practicePauseGo") + '</button></div></div>';
+  }
+  function savePracticePause() {
+    ensurePractice();
+    state.practice.resume = {
+      storyId: session.story.id, si: session.si, sn: session.sn,
+      words: session.words, readMs: session.readMs, helped: session.helped.slice(), rereads: session.rereads,
+      correct: session.correct, answered: session.answered, sentDone: session.sentDone
+    };
+    save(); renderHome(); show("screen-home");
+  }
+
+  function finishPracticeBookkeeping() {
+    ensurePractice();
+    var p = state.practice;
+    p.sessions.unshift({
+      date: todayKey(), storyId: session.story.id, words: session.words, ms: session.readMs,
+      wpm: Practice.wordsPerMinute(session.words, session.readMs),
+      helped: session.helped.length, rereads: session.rereads
+    });
+    p.sessions = p.sessions.slice(0, 60);
+    p.difficult = Practice.mergeDifficult(p.difficult, session.helped);
+    if (Practice.isFluent(session.helped.length, session.words) && p.fluentDone.indexOf(session.story.id) < 0)
+      p.fluentDone.push(session.story.id);
+    p.resume = null;
+  }
+
+  /* ---------- Repaso de palabras difíciles ---------- */
+  function startReview() {
+    ensurePractice();
+    var words = Practice.topDifficult(state.practice.difficult, 3);
+    if (!words.length) { renderHome(); show("screen-home"); return; }
+    renderPracticeReview(words);
+    show("screen-session");
+  }
+  function renderPracticeReview(words) {
+    reviewState = { words: words, i: 0, step: "syll", rec: null };
+    drawReview();
+  }
+  function drawReview() {
+    var rs = reviewState, html = '<div class="sec-head"><button class="icon-btn" data-act="home">✕</button></div>';
+    if (rs.i >= rs.words.length) {
+      html += '<div class="read-card" style="text-align:center"><div style="font-size:4rem">🎉</div>' +
+        '<h2>' + t("practiceReviewDone") + '</h2><div class="spacer"></div>' +
+        '<button class="btn primary big" data-act="home">' + t("backMap") + '</button></div>';
+      $("#screen-session").innerHTML = html; confetti(); return;
+    }
+    var w = rs.words[rs.i];
+    html += '<div class="read-card" style="text-align:center"><p class="eyebrow">' + t("practiceReviewTitle") +
+      ' · ' + (rs.i + 1) + '/' + rs.words.length + '</p><p class="muted">' + t("practiceReviewIntro") + '</p>';
+    if (rs.step === "syll") {
+      html += '<div class="practice-big">' + Practice.syllabify(w).join(" · ") + '</div>' +
+        '<div class="practice-actions"><button class="btn ghost" data-act="review-hear">🔊</button>' +
+        '<button class="btn primary big" data-act="review-next">' + t("next") + ' →</button></div>';
+    } else {
+      html += '<div class="practice-big">' + w + '</div><div class="practice-msg" id="practice-msg" role="status"></div>' +
+        '<div class="practice-actions">' +
+        (Recognizer.isSupported() ? '<button class="btn primary big" data-act="review-listen">' + t("practiceRead") + '</button>' : '') +
+        '<button class="btn ghost" data-act="review-hear">🔊</button>' +
+        '<button class="btn accent" data-act="review-next">' + t("next") + ' →</button></div>';
+    }
+    $("#screen-session").innerHTML = html + '</div>';
+  }
+  function reviewNext() {
+    var rs = reviewState; if (!rs) return;
+    stopPracticeListening();
+    if (rs.step === "syll") rs.step = "word"; else { rs.i++; rs.step = "syll"; }
+    drawReview();
+  }
+  function reviewListen() {
+    var rs = reviewState; if (!rs || rs.rec) return;
+    var word = rs.words[rs.i], heard = "", got = false;
+    setMsg(t("practiceListening"));
+    var rec = Recognizer.create({
+      lang: "es-CO",
+      onFinal: function (txt) { got = true; heard = txt; },
+      onError: function () {},
+      onEnd: function () {
+        if (reviewState !== rs || rs.rec !== rec) return;
+        rs.rec = null;
+        if (!heard.trim()) { setMsg(t("practiceNoHear")); return; }
+        if (Practice.alignReading(word, heard).allOk) { setMsg('🌟 ' + randomPraise()); ding(true); }
+        else { setMsg(t("practiceModel") + ' <b>' + word + '</b>'); speak(word); }
+      }
+    });
+    rs.rec = rec;
+    rec.start();
   }
 
   /* ============================================================
@@ -4131,7 +4511,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
      EVENT-DELEGATION (ein Listener fuer Touch/Click)
      ============================================================ */
   document.addEventListener("click", function (e) {
-    var tg = e.target.closest("[data-lang],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-set],[data-vocab]");
+    var tg = e.target.closest("[data-lang],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-set],[data-vocab],[data-practice-story]");
     if (!tg) return;
 
     // Sprachwahl
@@ -4153,6 +4533,12 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
     // Vokabel angeklickt
     if (tg.dataset.vocab) {
       vocabSheet(decodeURIComponent(tg.dataset.vocab), decodeURIComponent(tg.dataset.def));
+      return;
+    }
+    // Práctica en voz alta: tarjeta de historia
+    if (tg.dataset.practiceStory) {
+      if (tg.dataset.practiceLocked) { toast("\uD83D\uDD12 " + t("practiceLocked")); return; }
+      startPractice(tg.dataset.practiceStory, tg.dataset.resume ? state.practice.resume : undefined);
       return;
     }
     // Welt / Geschichte / Modus
@@ -4192,7 +4578,23 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
           if (session.phase === "read") renderSection(); else renderTask(); }
         else toast(t("noJoker"));
         break;
-      case "quit": stopTimer(); if (window.speechSynthesis) window.speechSynthesis.cancel(); renderHome(); show("screen-home"); break;
+      case "practice": renderPracticeList(); show("screen-world"); break;
+      case "practice-listen": practiceListen(); break;
+      case "practice-hear":
+        if (session && session.mode === "practice")
+          speak(session.modeling ? session.modeling.words[session.modeling.i] : session.sents[session.sn]);
+        break;
+      case "practice-next": if (session && session.mode === "practice") practiceNext(); break;
+      case "practice-adult-next":
+        if (session && session.mode === "practice") { if (session.modeling) modelAdvance(); else completeSentence(); }
+        break;
+      case "practice-pause-save": savePracticePause(); break;
+      case "practice-pause-go": renderPracticeSentence(); break;
+      case "practice-review": startReview(); break;
+      case "review-hear": if (reviewState) speak(reviewState.words[reviewState.i]); break;
+      case "review-next": reviewNext(); break;
+      case "review-listen": reviewListen(); break;
+      case "quit": stopTimer(); stopPracticeListening(); if (window.speechSynthesis) window.speechSynthesis.cancel(); renderHome(); show("screen-home"); break;
       case "reset":
         if (confirm(t("resetConfirm"))) { var lang = state.lang; state = JSON.parse(JSON.stringify(DEFAULT_STATE)); state.lang = lang; save(); applyPrefs(); closeSheet(); renderHome(); show("screen-home"); }
         break;
@@ -4216,6 +4618,7 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
      ============================================================ */
   function init() {
     ensureStats();
+    ensurePractice();
     applyPrefs();
     if (state.lang) { renderHome(); show("screen-home"); }
     else { renderLanguage(); show("screen-language"); }
@@ -4223,7 +4626,8 @@ if (typeof module !== "undefined" && module.exports) module.exports = Recognizer
   init();
 
   // Fuer Tests / Konsole zugaenglich machen
-  window.LeseAbenteuer = { state: function () { return state; }, CONTENT: CONTENT, estimateStoryMinutes: estimateStoryMinutes, sectionSeconds: sectionSeconds };
+  window.LeseAbenteuer = { state: function () { return state; }, CONTENT: CONTENT, estimateStoryMinutes: estimateStoryMinutes, sectionSeconds: sectionSeconds,
+    Recognizer: Recognizer, Practice: Practice, session: function () { return session; }, startPractice: startPractice, parentSheet: parentSheet };
 })();
 </script>
 </body>

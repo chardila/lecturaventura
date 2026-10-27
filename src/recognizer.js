@@ -9,7 +9,7 @@ var Recognizer = (function () {
     return window.SpeechRecognition || window.webkitSpeechRecognition || null;
   }
 
-  function isSupported() { return !!ctor(); }
+  function isSupported() { return !!factory || !!ctor(); }
 
   function mapError(code) {
     if (code === "not-allowed" || code === "service-not-allowed") return "not-allowed";

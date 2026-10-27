@@ -303,3 +303,15 @@ p { margin: 0 0 .8em; }
 [data-theme="dark"] .mc.hot  { background: #3a2418; }
 @keyframes detbeep { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 @media (prefers-reduced-motion: reduce) { .mc.hot { animation: none; } }
+
+/* 6. Práctica en voz alta ------------------------------------ */
+.practice-sentence { font-family: var(--font-read); font-size: calc(2rem * var(--read-scale)); line-height: 1.6; text-align: center; margin: 22px 0; }
+.practice-sentence .pw { display: inline-block; padding: 0 6px; margin: 0 1px; border-radius: 8px; transition: background .15s; }
+.practice-sentence .pw.lit { background: #ffe08a; color: #2a2118; }
+.practice-sentence .pw.ok { color: #1c7a52; }
+.practice-sentence .pw.doubt { background: #ffd9a8; color: #2a2118; }
+[data-theme="dark"] .practice-sentence .pw.ok { color: #7be3b4; }
+.practice-msg { text-align: center; min-height: 3rem; font-size: 1.2rem; margin: 8px 0 14px; }
+.practice-big { font-size: 2.6rem; font-weight: 700; text-align: center; margin: 10px 0; }
+.practice-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.practice-actions .btn.big { width: auto; min-width: 200px; }

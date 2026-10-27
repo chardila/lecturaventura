@@ -8,7 +8,7 @@ Basada en [reading-treasure-quest](https://github.com/AllesSuper/reading-treasur
 Abrir `index.html` en el navegador.
 
 ## Perfiles y zona de padres
-Al abrir la app aparece **¿Quién juega?**, con un perfil por niño. Cada perfil guarda su propio progreso y sus ajustes (idioma, tamaño y tipo de letra, tema, sonido); el niño no cambia ajustes por su cuenta.
+Al abrir la app aparece **¿Quién juega?**, con un perfil por niño. Cada perfil guarda su propio progreso y sus ajustes (idioma, tamaño y tipo de letra, tema, sonido y **cronómetro y comodines**; sin ellos el niño no ve ninguna presión de tiempo); el niño no cambia ajustes por su cuenta.
 - Los perfiles se crean en la **🔒 Zona de padres** (se entra resolviendo una multiplicación; es una barrera para niños pequeños, no seguridad real). Allí también se editan, se ve el informe de cada niño, se **borra el progreso** de un perfil (conserva sus ajustes), se **elimina** un perfil y se **borra todo**. Cada borrado pide confirmación.
 - El idioma es del perfil: un niño puede jugar en inglés y otro en español. La práctica en voz alta solo aparece en perfiles en español.
 - Máximo 8 perfiles. Los datos viven **solo en el dispositivo**: si se borran los datos del navegador, se pierden todos los perfiles.

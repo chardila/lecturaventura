@@ -9,7 +9,7 @@ var Profiles = (function () {
   var NAME_MAX = 20;
   var AVATARS = ["🦊", "🐙", "🐼", "🦁", "🐸", "🐵",
     "🦄", "🐢", "🐧", "🦉", "🐬", "🐝"];
-  var SETTING_KEYS = ["name", "avatar", "lang", "theme", "readScale", "readFont", "sound"];
+  var SETTING_KEYS = ["name", "avatar", "lang", "theme", "readScale", "readFont", "sound", "timers"];
   var LANGS = ["es", "en"];
   var CHOICES = {
     theme: ["light", "dark"],
@@ -51,6 +51,7 @@ var Profiles = (function () {
       readScale: CHOICES.readScale.indexOf(p.readScale) >= 0 ? p.readScale : "normal",
       readFont: CHOICES.readFont.indexOf(p.readFont) >= 0 ? p.readFont : "standard",
       sound: typeof p.sound === "boolean" ? p.sound : true,
+      timers: typeof p.timers === "boolean" ? p.timers : true,
       game: Object.assign(defaultGame(), isObj(p.game) ? p.game : {})
     };
   }
@@ -84,7 +85,7 @@ var Profiles = (function () {
     if (key === "name") { var n = cleanName(value); return n === null ? { ok: false, error: "name" } : { ok: true, value: n }; }
     if (key === "avatar") return AVATARS.indexOf(value) >= 0 ? { ok: true, value: value } : { ok: false, error: "avatar" };
     if (key === "lang") return LANGS.indexOf(value) >= 0 ? { ok: true, value: value } : { ok: false, error: "lang" };
-    if (key === "sound") return typeof value === "boolean" ? { ok: true, value: value } : { ok: false, error: "value" };
+    if (key === "sound" || key === "timers") return typeof value === "boolean" ? { ok: true, value: value } : { ok: false, error: "value" };
     return CHOICES[key].indexOf(value) >= 0 ? { ok: true, value: value } : { ok: false, error: "value" };
   }
 
@@ -98,7 +99,7 @@ var Profiles = (function () {
     }
     var profile = {
       id: newId(store), name: checked.name, avatar: checked.avatar, lang: checked.lang,
-      theme: "light", readScale: "normal", readFont: "standard", sound: true, game: defaultGame()
+      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true, game: defaultGame()
     };
     store.profiles.push(profile);
     return { ok: true, profile: profile };

@@ -132,3 +132,21 @@ test("defaultUiLang", function () {
   assert.equal(Profiles.defaultUiLang(null, undefined), "es");
   assert.equal(Profiles.defaultUiLang("xx", "en-GB"), "en");
 });
+
+test("ajuste timers (cronómetro y comodines)", function () {
+  assert.ok(Profiles.SETTING_KEYS.indexOf("timers") >= 0);
+  var store = Profiles.emptyStore();
+  var p = Profiles.addProfile(store, { name: "Ana", avatar: "🦊", lang: "es" }).profile;
+  assert.equal(p.timers, true);
+  assert.equal(Profiles.updateProfile(store, p.id, { timers: false }).ok, true);
+  assert.equal(p.timers, false);
+  assert.equal(Profiles.updateProfile(store, p.id, { timers: "no" }).error, "value");
+  assert.equal(Profiles.toState(p).timers, false);
+  var s = Profiles.parseStore(JSON.stringify({ version: 2, profiles: [{ id: "a", name: "Ana", avatar: "🦊", lang: "es" }] }));
+  assert.equal(s.profiles[0].timers, true);
+  var s2 = Profiles.parseStore(JSON.stringify({ version: 2, profiles: [{ id: "a", name: "Ana", avatar: "🦊", lang: "es", timers: false }] }));
+  assert.equal(s2.profiles[0].timers, false);
+  var st = Profiles.toState(p); st.timers = true; Profiles.applyState(p, st);
+  assert.equal(p.timers, true);
+  assert.equal(p.game.timers, undefined);
+});

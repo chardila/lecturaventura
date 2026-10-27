@@ -27,7 +27,7 @@
   var activeId = null;
   function baseState(lang) {
     return Profiles.toState({ name: "", avatar: "", lang: lang, theme: "light", readScale: "normal",
-      readFont: "standard", sound: true, game: Profiles.defaultGame() });
+      readFont: "standard", sound: true, timers: true, game: Profiles.defaultGame() });
   }
   var state = baseState(Profiles.defaultUiLang(store.lastLang, navigator.language));
   var session = null;
@@ -317,13 +317,14 @@
       elapsed: 0,                   // verbrachte Sekunden (fuer Eltern-Report)
       surpriseUsed: false, timer: null
     };
-    startTimer();
+    session.startedAt = Date.now();
+    if (state.timers !== false) startTimer();
     renderSection();
     show("screen-session");
   }
 
   function timerHtml() {                    // en la práctica en voz alta no hay cronómetro visible
-    return session && session.mode === "practice" ? "" :
+    return session && (session.mode === "practice" || state.timers === false) ? "" :
       '<div class="timer" id="timer"><span>\u23f1\ufe0f</span><span class="ring">0:00</span></div>';
   }
 
@@ -380,8 +381,9 @@
     html += '<button class="btn ghost" data-act="speak">\uD83D\uDD0A ' + t("readAloud") + '</button>';
     if (sec.easy)
       html += '<button class="btn ghost" data-act="toggleEasy">\uD83E\uDEB6 ' + (useEasy(sec) ? t("normalText") : t("easierText")) + '</button>';
-    html += '<button class="btn ghost" data-act="joker">\u23f3 ' + t("timeJoker") +
-      (jokerLabel ? ' (' + jokerLabel + ')' : '') + '</button>';
+    if (state.timers !== false)
+      html += '<button class="btn ghost" data-act="joker">\u23f3 ' + t("timeJoker") +
+        (jokerLabel ? ' (' + jokerLabel + ')' : '') + '</button>';
     html += '<button class="btn primary" style="margin-left:auto" data-act="toTasks">' + t("next") + ' \u2192</button>';
     html += '</div></div>';
 
@@ -588,6 +590,7 @@
   function finishSession() {
     stopTimer();
     if (session.mode === "practice") session.elapsed = Math.round(session.readMs / 1000);
+    else if (state.timers === false) session.elapsed = Math.round((Date.now() - session.startedAt) / 1000);
     // Sterne aus Trefferquote (0–3) + evtl. Bonus
     var rate = session.answered ? session.correct / session.answered : 0;
     var earnedStars = rate >= 0.9 ? 3 : rate >= 0.6 ? 2 : 1;
@@ -1044,7 +1047,7 @@
 
   function newDraft() {
     return { id: null, name: "", avatar: Profiles.AVATARS[0], lang: state.lang === "en" ? "en" : "es",
-      theme: "light", readScale: "normal", readFont: "standard", sound: true };
+      theme: "light", readScale: "normal", readFont: "standard", sound: true, timers: true };
   }
   function readDraftName() { var i = $("#profile-name"); if (i && parentDraft) parentDraft.name = i.value; }
 
@@ -1066,6 +1069,7 @@
       '<div class="row"><span>' + t("textSize") + '</span>' + seg("readScale", [{ v: "small", l: t("small") }, { v: "normal", l: t("normal") }, { v: "large", l: t("large") }], d.readScale) + '</div>' +
       '<div class="row"><span>' + t("readFont") + '</span>' + seg("readFont", [{ v: "standard", l: t("standard") }, { v: "dyslexia", l: t("easyRead") }, { v: "serif", l: "Serif" }], d.readFont) + '</div>' +
       '<div class="row"><span>' + t("sound") + '</span>' + seg("sound", [{ v: "on", l: t("on") }, { v: "off", l: t("off") }], d.sound ? "on" : "off") + '</div>' +
+      '<div class="row"><span>' + t("timersLabel") + '</span>' + seg("timers", [{ v: "on", l: t("on") }, { v: "off", l: t("off") }], d.timers ? "on" : "off") + '</div>' +
       '<div class="practice-msg" id="parents-msg" role="status">' + (msg || "") + '</div>' +
       '<div class="practice-actions"><button class="btn primary big" data-act="profile-save">' + t("profileSave") + '</button>' +
       '<button class="btn ghost" data-act="profile-cancel">' + t("profileCancel") + '</button></div></div>');
@@ -1074,7 +1078,7 @@
   function saveProfileDraft() {
     readDraftName();
     var d = parentDraft, res;
-    var settings = { name: d.name, avatar: d.avatar, lang: d.lang, theme: d.theme, readScale: d.readScale, readFont: d.readFont, sound: d.sound };
+    var settings = { name: d.name, avatar: d.avatar, lang: d.lang, theme: d.theme, readScale: d.readScale, readFont: d.readFont, sound: d.sound, timers: d.timers };
     if (d.id) res = Profiles.updateProfile(store, d.id, settings);
     else {
       res = Profiles.addProfile(store, { name: d.name, avatar: d.avatar, lang: d.lang });
@@ -1106,7 +1110,7 @@
       var p = Profiles.findProfile(store, tg.dataset.id);
       if (!p) return true;
       parentDraft = { id: p.id, name: p.name, avatar: p.avatar, lang: p.lang, theme: p.theme,
-        readScale: p.readScale, readFont: p.readFont, sound: p.sound };
+        readScale: p.readScale, readFont: p.readFont, sound: p.sound, timers: p.timers };
       renderProfileForm(); return true;
     }
     if (act === "parents-report") {
@@ -1314,7 +1318,7 @@
     if (tg.dataset.pset) {
       if (!parentUnlocked || !parentDraft) return;
       readDraftName();
-      parentDraft[tg.dataset.pset] = tg.dataset.pset === "sound" ? tg.dataset.val === "on" : tg.dataset.val;
+      parentDraft[tg.dataset.pset] = (tg.dataset.pset === "sound" || tg.dataset.pset === "timers") ? tg.dataset.val === "on" : tg.dataset.val;
       renderProfileForm();
       return;
     }
@@ -1364,6 +1368,7 @@
       }
       case "speakword": speak(decodeURIComponent(tg.dataset.w)); break;
       case "joker":
+        if (state.timers === false) break;
         if (session.jokers > 0) { session.jokers--; session.timeLeft += JOKER_SECONDS; updateTimer(); toast(t("jokerUsed"));
           if (session.phase === "read") renderSection(); else renderTask(); }
         else toast(t("noJoker"));

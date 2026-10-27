@@ -30,7 +30,7 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
    - Original: **Modo "escucha y repite"**: la app (o el padre) lee una frase con buen ritmo y la niña lee *la misma frase*.
 2. ~~**Escucha y corrección suave**~~ HECHO en versión iPad (modo Práctica en voz alta). Pendiente: Fire (APK con Vosk), inglés, ajustar umbrales tras la prueba real. Original: reconocimiento de voz; decirle con ternura si la leyó bien; evitar el tono de regaño.
 3. **Frenar la adivinanza**: ejercicios que premien leer lo que dice el texto (no la palabra supuesta); pista suave al fallar en vez de "no".
-4. **Quitar la presión de tiempo** para esta niña (desactivar contador y jokers).
+4. ~~**Quitar la presión de tiempo** para esta niña~~ HECHO: ajuste «Cronómetro y comodines» por perfil en la zona de padres.
 5. **Menos dependencia de imágenes**: historias en las que la imagen no revele el texto.
 6. **Modo acompañada → modo sola** (el padre guía al inicio; luego la app guía).
 7. **Medir fluidez** (palabras por minuto, progreso) en el panel de padres.
@@ -56,4 +56,4 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 
 ## Perfiles (hecho 2026-10-26)
 - [x] Perfiles por jugador con progreso y ajustes separados, idioma por perfil, zona de padres con candado y reseteo.
-- Siguiente: historias nuevas y más largas (sobre todo en inglés); orden/filtro de historias por nivel de cada perfil; respaldo/exportar perfiles; ajustes por perfil de cronómetro y comodines.
+- Siguiente: historias nuevas y más largas (sobre todo en inglés); orden/filtro de historias por nivel de cada perfil; respaldo/exportar perfiles.

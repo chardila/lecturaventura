@@ -13,30 +13,29 @@
   "use strict";
 
   /* ---------- Konstanten / Balancing ---------- */
-  var SAVE_KEY = "lecturaventura.save.v1";
-  var WPM = { 1: 55, 2: 70, 3: 85 };      // realistische Lesegeschw. Klasse 2
+    var WPM = { 1: 55, 2: 70, 3: 85 };      // realistische Lesegeschw. Klasse 2
   var TASK_SECONDS = 18;                    // Zeitpuffer je Aufgabe
   var JOKER_PER_SESSION = 3;
   var JOKER_SECONDS = 30;
   var COINS_CORRECT = 5, COINS_SECTION = 10;
   var WEEK_GOAL = 5;                        // Geschichten pro Woche
 
-  /* ---------- Persistenter Spielstand ---------- */
-  var DEFAULT_STATE = {
-    lang: null, theme: "light", readScale: "normal", readFont: "standard",
-    sound: true, name: "",
-    coins: 0, stars: 0, level: 1, xp: 0,
-    streak: 0, lastPlayed: null,
-    badges: {}, finished: {},
-    stats: { sessions: 0, correct: 0, answered: 0, words: 0, seconds: 0,
-      byType: { comprehension: { c: 0, n: 0 }, spelling: { c: 0, n: 0 }, vocab: { c: 0, n: 0 } } },
-    history: [],
-    mission: { day: null, read: false, correct: 0, finished: false },
-    week: { id: null, count: 0 },
-    practice: { sessions: [], difficult: {}, fluentDone: [], resume: null }
-  };
-  var state = load();
+  /* ---------- Perfiles: tienda y estado del jugador activo ---------- */
+  // `state` es una copia plana del perfil activo (Profiles.toState); save() la escribe de vuelta.
+  function readRaw() { try { return localStorage.getItem(Profiles.SAVE_KEY); } catch (e) { return null; } }
+  var store = Profiles.parseStore(readRaw());
+  var activeId = null;
+  function baseState(lang) {
+    return Profiles.toState({ name: "", avatar: "", lang: lang, theme: "light", readScale: "normal",
+      readFont: "standard", sound: true, game: Profiles.defaultGame() });
+  }
+  var state = baseState(Profiles.defaultUiLang(store.lastLang, navigator.language));
   var session = null;
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
 
   /* ---------- DOM-Helfer ---------- */
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -88,18 +87,15 @@
     if (!state.history) state.history = [];
   }
 
-  /* ---------- Speichern / Laden ---------- */
-  function load() {
-    try {
-      var raw = localStorage.getItem(SAVE_KEY);
-      if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATE));
-      var s = JSON.parse(raw);
-      // sanftes Merge, falls neue Felder dazukommen (Vorwärtskompatibilität)
-      return Object.assign(JSON.parse(JSON.stringify(DEFAULT_STATE)), s);
-    } catch (e) { return JSON.parse(JSON.stringify(DEFAULT_STATE)); }
+  /* ---------- Guardar ---------- */
+  function persistStore() {
+    try { localStorage.setItem(Profiles.SAVE_KEY, JSON.stringify(store)); } catch (e) {}
   }
   function save() {
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) {}
+    var p = activeId && Profiles.findProfile(store, activeId);
+    if (!p) return;
+    Profiles.applyState(p, state);
+    persistStore();
   }
 
   /* ---------- Theme / Lesbarkeit anwenden ---------- */
@@ -163,32 +159,52 @@
   /* ---------- HUD ---------- */
   function hudHtml() {
     return '<div class="hud">' +
-      '<div class="avatar">\uD83E\uDDD2</div>' +
-      '<div class="who">' + (state.name || t("hello")) +
+      '<div class="avatar">' + (state.avatar || "\uD83E\uDDD2") + '</div>' +
+      '<div class="who">' + (state.name ? esc(state.name) : t("hello")) +
         '<small>' + t("level") + " " + state.level + '</small></div>' +
       '<span class="chip gold"><span class="ic">\u2b50</span>' + state.stars + '</span>' +
       '<span class="chip"><span class="ic">\uD83E\uDE99</span>' + state.coins + '</span>' +
       '<span class="chip" title="' + t("streak") + '"><span class="ic">\uD83D\uDD25</span>' + state.streak + '</span>' +
-      '<button class="icon-btn" data-act="settings" aria-label="' + t("settings") + '">\u2699\ufe0f</button>' +
+      '<button class="icon-btn" data-act="switch" aria-label="' + t("switchPlayer") + '">\uD83D\uDC65</button>' +
       '</div>';
   }
 
   /* ============================================================
-     1) SPRACHWAHL
+     1) ¿QUIÉN JUEGA? (selección de perfil)
      ============================================================ */
-  function renderLanguage() {
-    var html = '<div class="center-col" style="padding-top:6vh">' +
-      '<div style="text-align:center">' +
-      '<div style="font-size:5rem">\uD83D\uDCDA\u2728</div>' +
-      '<h1>' + UI.es.appName + ' / ' + UI.en.appName + '</h1>' +
-      '<p class="muted" style="font-size:1.1rem">' + UI.es.chooseLang + '<br>' + UI.en.chooseLang + '</p>' +
-      '</div><div class="grid lang-grid spacer">';
-    SUPPORTED_LANGS.forEach(function (l) {
-      html += '<button class="card lang-tile" data-lang="' + l.code + '">' +
-        '<span class="flag">' + l.flag + '</span><span>' + l.name + '</span></button>';
-    });
-    html += '</div></div>';
-    $("#screen-language").innerHTML = html;
+  function renderProfiles() {
+    var html = '<div class="center-col" style="padding-top:5vh;text-align:center">' +
+      '<div style="font-size:4rem">\uD83D\uDCDA\u2728</div><h1>' + t("whoPlays") + '</h1>';
+    if (!store.profiles.length) html += '<p class="muted">' + t("noProfiles") + '</p>';
+    else {
+      html += '<div class="grid cards profile-grid">';
+      store.profiles.forEach(function (p) {
+        html += '<button class="card profile-tile" data-profile="' + esc(p.id) + '">' +
+          '<span class="profile-avatar">' + p.avatar + '</span><h3>' + esc(p.name) + '</h3>' +
+          '<p class="meta">\u2b50 ' + (p.game.stars || 0) + '</p></button>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="spacer"></div><button class="btn ghost" data-act="parents">\uD83D\uDD12 ' + t("parentZone") + '</button>' +
+      '<p class="muted" style="font-size:.85rem;margin-top:14px">' + t("storageNote") + '</p></div>';
+    $("#screen-profiles").innerHTML = html;
+  }
+  function enterProfile(id) {
+    var p = Profiles.findProfile(store, id);
+    if (!p) return;
+    activeId = id;
+    state = Profiles.toState(p);
+    ensureStats(); ensurePractice();
+    store.lastLang = state.lang;
+    save(); applyPrefs();
+    renderHome(); show("screen-home");
+  }
+  function leaveProfile() {
+    stopTimer(); stopPracticeListening(); closeSheet();
+    save();
+    session = null; activeId = null;
+    state = baseState(Profiles.defaultUiLang(store.lastLang, navigator.language));
+    applyPrefs(); renderProfiles(); show("screen-profiles");
   }
 
   /* ============================================================
@@ -980,24 +996,6 @@
   function openSheet(html) { sheet.innerHTML = html; overlay.classList.add("show"); }
   function closeSheet() { overlay.classList.remove("show"); }
 
-  function settingsSheet() {
-    function seg(act, opts, cur) {
-      return '<div class="seg">' + opts.map(function (o) {
-        return '<button data-set="' + act + '" data-val="' + o.v + '" class="' + (cur===o.v?"on":"") + '">' + o.l + '</button>';
-      }).join("") + '</div>';
-    }
-    var html = '<button class="btn ghost close" data-act="close">' + t("close") + '</button>' +
-      '<h2>\u2699\ufe0f ' + t("settings") + '</h2>' +
-      '<div class="row"><span>' + t("theme") + '</span>' + seg("theme", [{v:"light",l:t("light")},{v:"dark",l:t("dark")}], state.theme) + '</div>' +
-      '<div class="row"><span>' + t("textSize") + '</span>' + seg("readScale", [{v:"small",l:t("small")},{v:"normal",l:t("normal")},{v:"large",l:t("large")}], state.readScale) + '</div>' +
-      '<div class="row"><span>' + t("readFont") + '</span>' + seg("readFont", [{v:"standard",l:t("standard")},{v:"dyslexia",l:t("easyRead")},{v:"serif",l:"Serif"}], state.readFont) + '</div>' +
-      '<div class="row"><span>' + t("sound") + '</span>' + seg("sound", [{v:"on",l:t("on")},{v:"off",l:t("off")}], state.sound?"on":"off") + '</div>' +
-      '<div class="row"><span>' + t("language") + '</span>' + seg("lang", SUPPORTED_LANGS.map(function(l){return {v:l.code,l:l.flag+" "+l.name};}), state.lang) + '</div>' +
-      '<div class="spacer"></div>' +
-      '<button class="btn ghost" data-act="parent">\uD83D\uDC6A ' + t("parent") + '</button>';
-    openSheet(html);
-  }
-
   function parentSheet() {
     ensureStats();
     var st = state.stats;
@@ -1167,25 +1165,11 @@
      EVENT-DELEGATION (ein Listener fuer Touch/Click)
      ============================================================ */
   document.addEventListener("click", function (e) {
-    var tg = e.target.closest("[data-lang],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-set],[data-vocab],[data-practice-story]");
+    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story]");
     if (!tg) return;
 
-    // Sprachwahl
-    if (tg.dataset.lang && !tg.dataset.set) {
-      state.lang = tg.dataset.lang; save(); applyPrefs();
-      renderHome(); show("screen-home"); return;
-    }
-    // Einstellungs-Schalter
-    if (tg.dataset.set) {
-      var k = tg.dataset.set, v = tg.dataset.val;
-      if (k === "sound") state.sound = (v === "on");
-      else if (k === "lang") state.lang = v;
-      else state[k] = v;
-      save(); applyPrefs(); settingsSheet();
-      // Hintergrund-Screen aktualisieren
-      if ($("#screen-home").classList.contains("active")) renderHome();
-      return;
-    }
+    // Perfil elegido
+    if (tg.dataset.profile) { enterProfile(tg.dataset.profile); return; }
     // Vokabel angeklickt
     if (tg.dataset.vocab) {
       vocabSheet(decodeURIComponent(tg.dataset.vocab), decodeURIComponent(tg.dataset.def));
@@ -1209,9 +1193,9 @@
     // Aktionen
     var act = tg.dataset.act;
     switch (act) {
-      case "settings": settingsSheet(); break;
+      case "switch": leaveProfile(); break;
+      case "parents": toast("\uD83D\uDD12 ..."); break;
       case "close": closeSheet(); break;
-      case "parent": parentSheet(); break;
       case "collection": collectionSheet(); break;
       case "discover": discoverSheet(); break;
       case "home": closeSheet(); renderHome(); show("screen-home"); break;
@@ -1251,9 +1235,6 @@
       case "review-next": reviewNext(); break;
       case "review-listen": reviewListen(); break;
       case "quit": stopTimer(); stopPracticeListening(); if (window.speechSynthesis) window.speechSynthesis.cancel(); renderHome(); show("screen-home"); break;
-      case "reset":
-        if (confirm(t("resetConfirm"))) { var lang = state.lang; state = JSON.parse(JSON.stringify(DEFAULT_STATE)); state.lang = lang; save(); applyPrefs(); closeSheet(); renderHome(); show("screen-home"); }
-        break;
     }
   });
   // Overlay-Hintergrund schliesst Sheet
@@ -1273,15 +1254,15 @@
      INIT
      ============================================================ */
   function init() {
-    ensureStats();
-    ensurePractice();
+    try { localStorage.removeItem(Profiles.LEGACY_KEY); } catch (e) {}
     applyPrefs();
-    if (state.lang) { renderHome(); show("screen-home"); }
-    else { renderLanguage(); show("screen-language"); }
+    renderProfiles();
+    show("screen-profiles");
   }
   init();
 
   // Fuer Tests / Konsole zugaenglich machen
   window.LeseAbenteuer = { state: function () { return state; }, CONTENT: CONTENT, estimateStoryMinutes: estimateStoryMinutes, sectionSeconds: sectionSeconds,
-    Recognizer: Recognizer, Practice: Practice, session: function () { return session; }, startPractice: startPractice, parentSheet: parentSheet };
+    Recognizer: Recognizer, Practice: Practice, Profiles: Profiles, store: function () { return store; },
+    enterProfile: enterProfile, leaveProfile: leaveProfile, session: function () { return session; }, startPractice: startPractice, parentSheet: parentSheet };
 })();

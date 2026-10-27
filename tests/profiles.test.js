@@ -116,3 +116,19 @@ test("toState y applyState", function () {
   assert.equal(p.game.extra, 1);
   assert.equal(p.stars, undefined);
 });
+
+test("makeLock y checkLock", function () {
+  assert.deepEqual(Profiles.makeLock(function () { return 0; }), { question: "12 × 3", answer: 36 });
+  assert.deepEqual(Profiles.makeLock(function () { return 0.999; }), { question: "19 × 9", answer: 171 });
+  var lock = { question: "12 × 3", answer: 36 };
+  assert.equal(Profiles.checkLock(lock, " 36 "), true);
+  ["35", "", "abc"].forEach(function (x) { assert.equal(Profiles.checkLock(lock, x), false, x); });
+});
+
+test("defaultUiLang", function () {
+  assert.equal(Profiles.defaultUiLang("en", "es-CO"), "en");
+  assert.equal(Profiles.defaultUiLang(null, "en-US"), "en");
+  assert.equal(Profiles.defaultUiLang(null, "es-CO"), "es");
+  assert.equal(Profiles.defaultUiLang(null, undefined), "es");
+  assert.equal(Profiles.defaultUiLang("xx", "en-GB"), "en");
+});

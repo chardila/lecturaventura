@@ -3507,12 +3507,29 @@ var Profiles = (function () {
     profile.game = game;
   }
 
+  function makeLock(rng) {
+    var r = rng || Math.random;
+    var a = 12 + Math.floor(r() * 8), b = 3 + Math.floor(r() * 7);
+    return { question: a + " \u00d7 " + b, answer: a * b };
+  }
+
+  function checkLock(lock, input) {
+    var s = String(input).trim();
+    return /^\d+$/.test(s) && parseInt(s, 10) === lock.answer;
+  }
+
+  function defaultUiLang(lastLang, browserLang) {
+    if (LANGS.indexOf(lastLang) >= 0) return lastLang;
+    return typeof browserLang === "string" && /^en/i.test(browserLang) ? "en" : "es";
+  }
+
   var api = {
     STORE_VERSION: STORE_VERSION, SAVE_KEY: SAVE_KEY, LEGACY_KEY: LEGACY_KEY,
     MAX_PROFILES: MAX_PROFILES, NAME_MAX: NAME_MAX, AVATARS: AVATARS, SETTING_KEYS: SETTING_KEYS,
     emptyStore: emptyStore, defaultGame: defaultGame, parseStore: parseStore, findProfile: findProfile,
     addProfile: addProfile, updateProfile: updateProfile, deleteProfile: deleteProfile,
-    resetProgress: resetProgress, resetAll: resetAll, toState: toState, applyState: applyState
+    resetProgress: resetProgress, resetAll: resetAll, toState: toState, applyState: applyState,
+    makeLock: makeLock, checkLock: checkLock, defaultUiLang: defaultUiLang
   };
   return api;
 })();

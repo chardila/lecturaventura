@@ -320,3 +320,7 @@ p { margin: 0 0 .8em; }
 .profile-grid { justify-content: center; margin-top: 18px; }
 .profile-tile { text-align: center; }
 .profile-avatar { display: inline-block; font-size: 3.2rem; width: 96px; height: 96px; line-height: 96px; border-radius: 50%; background: var(--c-surface-2); }
+.text-input { font: inherit; font-size: 1.3rem; padding: 12px 14px; border-radius: var(--radius-sm); border: 2px solid var(--c-line); background: var(--c-surface); color: var(--c-ink); min-height: var(--tap); max-width: 100%; text-align: center; }
+.avatar-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.avatar-opt { font-size: 2rem; width: var(--tap); height: var(--tap); border-radius: 50%; border: 3px solid transparent; background: var(--c-surface-2); }
+.avatar-opt.on { border-color: var(--c-primary); }

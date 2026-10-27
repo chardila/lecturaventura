@@ -990,6 +990,118 @@
   }
 
   /* ============================================================
+     ZONA DE PADRES (candado + perfiles)
+     ============================================================ */
+  var parentLock = null, parentUnlocked = false, parentDraft = null;
+
+  function parentsScreen(html) { $("#screen-parents").innerHTML = html; }
+  function langLabel(code) {
+    var l = SUPPORTED_LANGS.filter(function (x) { return x.code === code; })[0];
+    return l ? l.flag + " " + l.name : code;
+  }
+
+  function renderLock(wrong) {
+    parentsScreen('<div class="center-col" style="padding-top:8vh;text-align:center">' +
+      '<div style="font-size:3.5rem">🔒</div><h1>' + t("lockTitle") + '</h1>' +
+      '<p class="muted">' + (wrong ? t("lockWrong") : t("lockAsk")) + '</p>' +
+      '<p class="practice-big">' + parentLock.question + ' = ?</p>' +
+      '<input id="lock-answer" class="text-input" type="text" inputmode="numeric" autocomplete="off">' +
+      '<div class="spacer"></div><div class="practice-actions">' +
+      '<button class="btn primary big" data-act="lock-submit">' + t("lockEnter") + '</button>' +
+      '<button class="btn ghost" data-act="parents-exit">' + t("close") + '</button></div></div>');
+    var inp = $("#lock-answer"); if (inp) inp.focus();
+  }
+
+  function renderParentsHome() {
+    var html = '<div class="center-col" style="padding-top:3vh"><h1>🔓 ' + t("parentZone") + '</h1>' +
+      '<p class="muted" style="font-size:.9rem">' + t("storageNote") + '</p>';
+    store.profiles.forEach(function (p) {
+      html += '<div class="mission"><span class="big-ic">' + p.avatar + '</span><div style="flex:1">' +
+        '<strong>' + esc(p.name) + '</strong> <span class="muted">' + langLabel(p.lang) + ' · ⭐ ' + (p.game.stars || 0) + '</span></div>' +
+        '<button class="btn ghost" data-act="parents-edit" data-id="' + esc(p.id) + '">' + t("editProfile") + '</button>' +
+        '</div>';
+    });
+    html += '<div class="spacer"></div><div class="practice-actions">' +
+      (store.profiles.length >= Profiles.MAX_PROFILES
+        ? '<p class="muted">' + t("limitReached") + '</p>'
+        : '<button class="btn primary" data-act="parents-new">＋ ' + t("newProfile") + '</button>') +
+      '<button class="btn ghost" data-act="parents-exit">' + t("exitParents") + '</button></div></div>';
+    parentsScreen(html);
+  }
+
+  function newDraft() {
+    return { id: null, name: "", avatar: Profiles.AVATARS[0], lang: state.lang === "en" ? "en" : "es",
+      theme: "light", readScale: "normal", readFont: "standard", sound: true };
+  }
+  function readDraftName() { var i = $("#profile-name"); if (i && parentDraft) parentDraft.name = i.value; }
+
+  function renderProfileForm(msg) {
+    var d = parentDraft;
+    function seg(key, opts, cur) {
+      return '<div class="seg">' + opts.map(function (o) {
+        return '<button data-pset="' + key + '" data-val="' + o.v + '" class="' + (cur === o.v ? "on" : "") + '">' + o.l + '</button>';
+      }).join("") + '</div>';
+    }
+    var avatars = Profiles.AVATARS.map(function (a) {
+      return '<button class="avatar-opt' + (d.avatar === a ? " on" : "") + '" data-pset="avatar" data-val="' + a + '">' + a + '</button>';
+    }).join("");
+    parentsScreen('<div class="center-col" style="padding-top:3vh"><h1>' + (d.id ? t("editProfile") : t("newProfile")) + '</h1>' +
+      '<div class="row"><span>' + t("fieldName") + '</span><input id="profile-name" class="text-input" maxlength="' + Profiles.NAME_MAX + '" value="' + esc(d.name) + '"></div>' +
+      '<div class="row"><span>' + t("fieldAvatar") + '</span><div class="avatar-grid">' + avatars + '</div></div>' +
+      '<div class="row"><span>' + t("language") + '</span>' + seg("lang", SUPPORTED_LANGS.map(function (l) { return { v: l.code, l: l.flag + " " + l.name }; }), d.lang) + '</div>' +
+      '<div class="row"><span>' + t("theme") + '</span>' + seg("theme", [{ v: "light", l: t("light") }, { v: "dark", l: t("dark") }], d.theme) + '</div>' +
+      '<div class="row"><span>' + t("textSize") + '</span>' + seg("readScale", [{ v: "small", l: t("small") }, { v: "normal", l: t("normal") }, { v: "large", l: t("large") }], d.readScale) + '</div>' +
+      '<div class="row"><span>' + t("readFont") + '</span>' + seg("readFont", [{ v: "standard", l: t("standard") }, { v: "dyslexia", l: t("easyRead") }, { v: "serif", l: "Serif" }], d.readFont) + '</div>' +
+      '<div class="row"><span>' + t("sound") + '</span>' + seg("sound", [{ v: "on", l: t("on") }, { v: "off", l: t("off") }], d.sound ? "on" : "off") + '</div>' +
+      '<div class="practice-msg" id="parents-msg" role="status">' + (msg || "") + '</div>' +
+      '<div class="practice-actions"><button class="btn primary big" data-act="profile-save">' + t("profileSave") + '</button>' +
+      '<button class="btn ghost" data-act="profile-cancel">' + t("profileCancel") + '</button></div></div>');
+  }
+
+  function saveProfileDraft() {
+    readDraftName();
+    var d = parentDraft, res;
+    var settings = { name: d.name, avatar: d.avatar, lang: d.lang, theme: d.theme, readScale: d.readScale, readFont: d.readFont, sound: d.sound };
+    if (d.id) res = Profiles.updateProfile(store, d.id, settings);
+    else {
+      res = Profiles.addProfile(store, { name: d.name, avatar: d.avatar, lang: d.lang });
+      if (res.ok) res = Profiles.updateProfile(store, res.profile.id, settings);
+    }
+    if (!res.ok) { renderProfileForm(res.error === "limit" ? t("limitReached") : t("nameRequired")); return; }
+    persistStore();
+    parentDraft = null;
+    renderParentsHome();
+  }
+
+  function parentAction(act, tg) {
+    if (act === "parents") {
+      parentLock = Profiles.makeLock(); parentUnlocked = false; parentDraft = null;
+      renderLock(false); show("screen-parents"); return true;
+    }
+    if (act === "parents-exit") {
+      parentUnlocked = false; parentDraft = null; renderProfiles(); show("screen-profiles"); return true;
+    }
+    if (act === "lock-submit") {
+      var inp = $("#lock-answer");
+      if (parentLock && Profiles.checkLock(parentLock, inp ? inp.value : "")) { parentUnlocked = true; renderParentsHome(); }
+      else { parentLock = Profiles.makeLock(); renderLock(true); }
+      return true;
+    }
+    if (!parentUnlocked) return false;
+    if (act === "parents-new") { parentDraft = newDraft(); renderProfileForm(); return true; }
+    if (act === "parents-edit") {
+      var p = Profiles.findProfile(store, tg.dataset.id);
+      if (!p) return true;
+      parentDraft = { id: p.id, name: p.name, avatar: p.avatar, lang: p.lang, theme: p.theme,
+        readScale: p.readScale, readFont: p.readFont, sound: p.sound };
+      renderProfileForm(); return true;
+    }
+    if (act === "profile-cancel") { parentDraft = null; renderParentsHome(); return true; }
+    if (act === "profile-save") { if (parentDraft) saveProfileDraft(); return true; }
+    return false;
+  }
+
+  /* ============================================================
      SHEETS: Einstellungen, Wortschatz, Sammlung, Eltern, Entdecken
      ============================================================ */
   var overlay = $("#overlay"), sheet = $("#sheet");
@@ -1165,9 +1277,17 @@
      EVENT-DELEGATION (ein Listener fuer Touch/Click)
      ============================================================ */
   document.addEventListener("click", function (e) {
-    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story]");
+    var tg = e.target.closest("[data-profile],[data-world],[data-locked],[data-story],[data-mode],[data-act],[data-opt],[data-spot],[data-vocab],[data-practice-story],[data-pset]");
     if (!tg) return;
 
+    // Formulario de perfil (zona de padres)
+    if (tg.dataset.pset) {
+      if (!parentUnlocked || !parentDraft) return;
+      readDraftName();
+      parentDraft[tg.dataset.pset] = tg.dataset.pset === "sound" ? tg.dataset.val === "on" : tg.dataset.val;
+      renderProfileForm();
+      return;
+    }
     // Perfil elegido
     if (tg.dataset.profile) { enterProfile(tg.dataset.profile); return; }
     // Vokabel angeklickt
@@ -1192,9 +1312,9 @@
 
     // Aktionen
     var act = tg.dataset.act;
+    if (act && parentAction(act, tg)) return;
     switch (act) {
       case "switch": leaveProfile(); break;
-      case "parents": toast("\uD83D\uDD12 ..."); break;
       case "close": closeSheet(); break;
       case "collection": collectionSheet(); break;
       case "discover": discoverSheet(); break;
@@ -1235,6 +1355,11 @@
       case "review-next": reviewNext(); break;
       case "review-listen": reviewListen(); break;
       case "quit": stopTimer(); stopPracticeListening(); if (window.speechSynthesis) window.speechSynthesis.cancel(); renderHome(); show("screen-home"); break;
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && e.target && e.target.id === "lock-answer") {
+      var b = $('[data-act="lock-submit"]'); if (b) b.click();
     }
   });
   // Overlay-Hintergrund schliesst Sheet

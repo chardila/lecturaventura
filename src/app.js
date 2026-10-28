@@ -265,7 +265,7 @@
     var world = findWorld(worldId);
     var w = $("#screen-world");
     var html = hudHtml() +
-      '<div class="btn-row spacer"><button class="btn ghost" data-act="home">\u2190 ' + t("map") + '</button></div>' +
+      '<div class="btn-row"><button class="btn ghost" data-act="home">\u2190 ' + t("map") + '</button></div><div class="spacer"></div>' +
       '<section><h1>' + world.emoji + ' ' + loc(world.name) + '</h1>' +
       '<p class="muted">' + t("chooseStory") + '</p><div class="grid cards">';
     world.stories.forEach(function (story, idx) {
@@ -702,7 +702,7 @@
     var order = Practice.orderStoriesByWords(stories, "es");
     var open = Practice.unlockedStoryIds(order, state.practice.fluentDone);
     var html = hudHtml() +
-      '<div class="btn-row spacer"><button class="btn ghost" data-act="home">← ' + t("map") + '</button></div>' +
+      '<div class="btn-row"><button class="btn ghost" data-act="home">← ' + t("map") + '</button></div><div class="spacer"></div>' +
       '<section><h1>🗣️ ' + t("practiceTitle") + '</h1><p class="muted">' + t("practiceIntro") + '</p>';
     var res = state.practice.resume;
     if (res && byId[res.storyId]) {

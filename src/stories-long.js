@@ -497,5 +497,8 @@
   });
   // @dani-stories
 
+  BADGES.mili = { emoji: "☁️", es: "Amiga de Nubi", en: "Puff's friend" };
+  BADGES.dani = { emoji: "🐶", es: "Cuaderno de Dani", en: "Danny's notebook" };
+
   CONTENT.worlds.push(mili, dani);
 })();

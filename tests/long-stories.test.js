@@ -135,3 +135,15 @@ test("continuidad: las historias 2 y 3 mencionan al protagonista y a su compañe
     });
   });
 });
+
+test("cada mundo tiene insignia en es y en (Libro del tesoro y fin de historia)", function () {
+  var fs = require("fs"), path = require("path");
+  var src = ["content.js", "stories-long.js"].map(function (f) {
+    return fs.readFileSync(path.join(__dirname, "../src/" + f), "utf8");
+  }).join("\n");
+  var r = new Function(src + "; return { CONTENT: CONTENT, BADGES: BADGES }")();
+  r.CONTENT.worlds.forEach(function (w) {
+    var b = r.BADGES[w.id];
+    assert.ok(b && b.emoji && b.es && b.en, "falta insignia para " + w.id);
+  });
+});

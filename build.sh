@@ -27,6 +27,7 @@ OUT=index.html
   cat src/recognizer.js
   cat src/profiles.js
   cat src/library.js
+  cat src/voice.js
   cat src/app.js
   echo '</script>'
   echo '</body>'

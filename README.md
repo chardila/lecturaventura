@@ -41,3 +41,6 @@ Los botones "Escuchar" y "Oír la frase" usan audios pregenerados con voces neur
 - `src/app.js`: lógica. `src/styles.css`, `src/shell.html`: diseño y estructura.
 - Después de editar `src/`: `bash build.sh` regenera `index.html`.
 - Un mundo aparece en un idioma solo si sus historias tienen texto en ese idioma. Hoy ambos idiomas tienen los 5 mundos (15 historias) más las 6 historias largas.
+
+## Licencia
+[MIT](LICENSE) © 2026 Carlos Ardila. La licencia cubre el código; los audios generados con `edge-tts` tienen las salvedades de uso indicadas arriba.

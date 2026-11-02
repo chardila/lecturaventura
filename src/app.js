@@ -783,7 +783,7 @@
   function stopPracticeListening() {
     if (session && session.rec) { var r = session.rec; session.rec = null; try { r.stop(); } catch (e) {} }
     if (reviewState && reviewState.rec) { var r2 = reviewState.rec; reviewState.rec = null; try { r2.stop(); } catch (e) {} }
-    if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+    stopSpeech();
   }
 
   // Ilumina las palabras que ya se han oído mientras la niña lee (resultados parciales)
@@ -800,7 +800,7 @@
   function practiceListen() {
     if (!session || session.mode !== "practice" || session.rec) return;      // doble toque
     if (!Recognizer.isSupported()) { setMsg(t("practiceUnsupported")); setHidden("#practice-adult", false); return; }
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    stopSpeech();
     var mine = session, heard = "", got = false, err = null;
     mine.listenStart = Date.now();
     setMsg(t("practiceListening"));
@@ -1283,7 +1283,7 @@
     var exact = voices.filter(function (v) { return v.lang.replace("_", "-").toLowerCase() === langTag.toLowerCase(); })[0];
     return exact || voices.filter(function (v) { return v.lang.toLowerCase().indexOf(base) === 0; })[0] || null;
   }
-  function speak(text) {
+  function speakFallback(text) {
     if (!("speechSynthesis" in window)) { toast("\uD83D\uDD07 " + t("noVoice")); return; }
     window.speechSynthesis.cancel();
     var tag = state.lang === "en" ? "en-GB" : "es-CO";
@@ -1294,6 +1294,73 @@
     // Sin voces instaladas o fallo del motor: avisar en vez de quedarse en silencio
     u.onerror = function (e) { if (e.error !== "canceled" && e.error !== "interrupted") toast("\uD83D\uDD07 " + t("noVoice")); };
     window.speechSynthesis.speak(u);
+  }
+  // Voces pregeneradas: un solo Audio reutilizado (desbloqueado en el primer toque, que iPad/Silk exigen)
+  var voiceEl = new Audio();
+  var speakId = 0, voiceBlobUrl = null, manifestPromise = null;
+  var SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+  document.addEventListener("pointerdown", function () {
+    try {
+      voiceEl.src = SILENT_WAV;
+      var p = voiceEl.play();
+      if (p && p.then) p.then(function () { if (voiceEl.src === SILENT_WAV) voiceEl.pause(); }, function () {});
+      else if (voiceEl.src === SILENT_WAV) voiceEl.pause();
+    } catch (e) {}
+  }, { once: true });
+  function stopSpeech() {
+    speakId++;
+    try { voiceEl.pause(); } catch (e) {}
+    if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  }
+  function loadManifest() {
+    if (!manifestPromise) {
+      if (location.protocol === "file:") manifestPromise = Promise.resolve(null);   // el navegador bloquea fetch en file://
+      else manifestPromise = fetch("audio/manifest.json").then(function (r) {
+        if (!r.ok) throw new Error("manifest " + r.status);
+        return r.json();
+      }).catch(function () { return null; });
+    }
+    return manifestPromise;
+  }
+  function blobUrlOf(resp) {
+    return resp.blob().then(function (b) { return URL.createObjectURL(b); });
+  }
+  function fetchClip(url) {
+    function plain() {
+      return fetch(url).then(function (r) {
+        if (!r.ok) throw new Error("clip " + r.status);
+        return blobUrlOf(r);
+      });
+    }
+    if (!window.caches) return plain();
+    return window.caches.open("voces-v1").then(function (cache) {
+      return cache.match(url).then(function (hit) {
+        if (hit) return blobUrlOf(hit);
+        return fetch(url).then(function (r) {
+          if (!r.ok) throw new Error("clip " + r.status);
+          var copy = r.clone();
+          return cache.put(url, copy).catch(function () {}).then(function () { return blobUrlOf(r); });
+        });
+      });
+    }).catch(function () { return plain(); });
+  }
+  function speak(text) {
+    stopSpeech();
+    var id = speakId;
+    function fallback() { if (id === speakId) speakFallback(text); }
+    loadManifest().then(function (manifest) {
+      var url = manifest ? Voice.resolve(manifest, state.lang === "en" ? "en" : "es", text) : null;
+      if (!url) throw new Error("sin clip");
+      return fetchClip(url);
+    }).then(function (src) {
+      if (id !== speakId) { if (src.indexOf("blob:") === 0) URL.revokeObjectURL(src); return; }
+      var old = voiceBlobUrl;
+      voiceBlobUrl = src.indexOf("blob:") === 0 ? src : null;
+      voiceEl.src = src;
+      if (old) URL.revokeObjectURL(old);
+      var p = voiceEl.play();
+      if (p && p.catch) p.catch(fallback);
+    }).catch(fallback);
   }
   if ("speechSynthesis" in window) window.speechSynthesis.getVoices();   // algunos navegadores cargan las voces de forma diferida
   function confetti() {
@@ -1399,7 +1466,7 @@
       case "review-hear": if (reviewState) speak(reviewState.words[reviewState.i]); break;
       case "review-next": reviewNext(); break;
       case "review-listen": reviewListen(); break;
-      case "quit": stopTimer(); stopPracticeListening(); if (window.speechSynthesis) window.speechSynthesis.cancel(); renderHome(); show("screen-home"); break;
+      case "quit": stopTimer(); stopPracticeListening(); stopSpeech(); renderHome(); show("screen-home"); break;
     }
   });
   document.addEventListener("keydown", function (e) {

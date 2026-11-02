@@ -38,7 +38,7 @@ function synthesize(clip, outPath) {
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   var args = ["-v", VOICES[clip.lang], "--rate=" + RATE, "--text=" + clip.text, "--write-media", tmp];
   return new Promise(function (resolve, reject) {
-    execFile(findEdgeTts(), args, { maxBuffer: 10 * 1024 * 1024 }, function (err, stdout, stderr) {
+    execFile(findEdgeTts(), args, { maxBuffer: 10 * 1024 * 1024, timeout: 60000 }, function (err, stdout, stderr) {
       function fail(e) { try { fs.unlinkSync(tmp); } catch (x) {} reject(e); }
       if (err) return fail(new Error("edge-tts fallo: " + (stderr || err.message)));
       var size = 0;

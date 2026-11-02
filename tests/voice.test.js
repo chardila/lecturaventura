@@ -8,6 +8,9 @@ test("key: estable y de 14 hex", function () {
   var k = Voice.key("es", "Hola mundo");
   assert.match(k, /^[0-9a-f]{14}$/);
   assert.equal(Voice.key("es", "Hola mundo"), k);
+  // Literales fijos: el generador (Node) y el navegador deben coincidir siempre.
+  assert.equal(Voice.key("es", "Hola mundo"), "1680588257a02a");
+  assert.equal(Voice.key("en", "Hello world"), "1db5334e396823");
 });
 
 test("key: normaliza espacios", function () {
@@ -20,7 +23,11 @@ test("key: distingue idioma y puntuación", function () {
 });
 
 test("normalize: conserva ñ y tildes (NFC)", function () {
-  assert.equal(Voice.normalize("mamá niño"), "mamá niño");
+  var combining = "mama\u0301", precomposed = "mam\u00e1";
+  assert.notEqual(combining, precomposed);
+  assert.equal(Voice.normalize(combining + " ni\u00f1o"), precomposed + " ni\u00f1o");
+  assert.equal(Voice.key("es", combining), Voice.key("es", precomposed));
+  assert.equal(Voice.key("es", precomposed), "07b65a05826041");
 });
 
 function sections(content) {

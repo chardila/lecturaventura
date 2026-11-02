@@ -72,7 +72,18 @@ var Voice = (function () {
     return clip && clip.lang === lang ? clipUrl(lang, k) : null;
   }
 
-  return { normalize: normalize, key: key, clipsFor: clipsFor, clipUrl: clipUrl, resolve: resolve };
+  // Clips del idioma que aún no están guardados; isCached(url) decide (la app consulta el caché).
+  function pendingFor(manifest, lang, isCached) {
+    var out = [];
+    if (!manifest || !manifest.clips) return out;
+    Object.keys(manifest.clips).sort().forEach(function (k) {
+      var c = manifest.clips[k];
+      if (c && c.lang === lang && !isCached(clipUrl(lang, k))) out.push({ key: k, bytes: c.bytes || 0 });
+    });
+    return out;
+  }
+
+  return { pendingFor: pendingFor, normalize: normalize, key: key, clipsFor: clipsFor, clipUrl: clipUrl, resolve: resolve };
 })();
 
 if (typeof module !== "undefined" && module.exports) module.exports = Voice;

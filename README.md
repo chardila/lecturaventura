@@ -25,8 +25,18 @@ Botón **🗣️ Práctica en voz alta** en el mapa. La niña lee una historia f
 - El informe de adultos (⚙️ → Informe) muestra palabras por minuto y palabras con ayuda de las últimas prácticas.
 - Diseño: `docs/superpowers/specs/`; plan: `docs/superpowers/plans/`.
 
+## Voces
+Los botones "Escuchar" y "Oír la frase" usan audios pregenerados con voces neuronales (es-CO: Salomé; en: voz de edge-tts), en vez de la voz del navegador. Si un clip no existe o falla, la app usa la voz del navegador como respaldo.
+- `audio/es/` y `audio/en/`: un MP3 por texto (historia, frase o palabra), con nombre `<clave>.mp3`; `audio/manifest.json` lista los clips con su tamaño.
+- Regenerar tras editar una historia: `node tools/generar-voces.js` (solo crea lo que falta). Requiere `pipx install edge-tts`. Después, `node --test tests/*.test.js` comprueba que todo el texto tenga su audio.
+- Las voces solo funcionan abriendo la app desde GitHub Pages u otro `http(s)`; desde un archivo (`file://`) el navegador bloquea la carga y se usa la voz del navegador.
+- Sin internet: en la zona de padres, tarjeta **Voces para usar sin internet**, un botón por idioma de los perfiles. Pide confirmar (muestra los MB, mejor con wifi), se puede cancelar y al repetir solo baja lo que falta. Los audios quedan en el caché `voces-v1` del navegador.
+- Términos de uso: `edge-tts` usa el servicio de lectura de Microsoft Edge sin ser una API oficial; es una zona gris. Uso familiar sin problema práctico, pero no vender ni promocionar la app con estos audios. Si se quisiera publicar, la alternativa es Azure AI Speech con las mismas voces (de pago, con licencia clara).
+- Diseño: `docs/superpowers/specs/2026-11-02-voces-pregeneradas-design.md`.
+
 ## Desarrollo
-- Pruebas de la lógica pura: `node --test tests/*.test.js` (`src/practice.js`, `src/recognizer.js`, `src/profiles.js`, `src/library.js` y el contenido de las historias largas).
+- Pruebas de la lógica pura: `node --test tests/*.test.js` (`src/practice.js`, `src/recognizer.js`, `src/profiles.js`, `src/library.js`, `src/voice.js` y el contenido de las historias largas).
+- `tools/generar-voces.js`: genera los audios de `audio/`; `tests/voice*.test.js` y `tests/generar-voces.test.js` prueban claves, cobertura y generador.
 - `src/content.js`: textos de la interfaz e historias (es/en).
 - `src/app.js`: lógica. `src/styles.css`, `src/shell.html`: diseño y estructura.
 - Después de editar `src/`: `bash build.sh` regenera `index.html`.

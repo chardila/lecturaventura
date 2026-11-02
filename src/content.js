@@ -197,6 +197,15 @@ const UI = {
     focusSpelling: "Practiquen ortografía. Aplaudir las sílabas de cada palabra ayuda.",
     focusVocab: "Hablen de las palabras nuevas y usen las tarjetas de palabras.",
     focusGreat: "¡Muy buen rendimiento, equilibrado! Sigan así.",
+    voicesTitle: "Voces para usar sin internet",
+    voicesDownload: "Descargar voces ({lang})",
+    voicesSize: "Se descargarán unos {mb} MB. Mejor con wifi. ¿Continuar?",
+    voicesProgress: "Descargando voces: {done} de {total}",
+    voicesDone: "Listo: las voces ya están en este dispositivo.",
+    voicesCancel: "Cancelar",
+    voicesNoCache: "Este navegador no puede guardar las voces para usarlas sin internet.",
+    voicesError: "No se pudo obtener la lista de voces. Abre la app desde internet (no desde un archivo) y vuelve a intentar.",
+    voicesPartial: "Se guardaron {done} de {total}. Vuelve a intentar para bajar el resto.",
     noVoice: "Este navegador no tiene voz para leer en voz alta. Prueba con otro navegador o instala una voz.",
     abc: "A B C"
   },
@@ -345,6 +354,15 @@ const UI = {
     focusVocab: "Talk about new words – use the vocabulary cards.",
     focusGreat: "Great, balanced performance – keep it up!",
     abc: "A B C",
+    voicesTitle: "Voices for offline use",
+    voicesDownload: "Download voices ({lang})",
+    voicesSize: "About {mb} MB will be downloaded. Better on wifi. Continue?",
+    voicesProgress: "Downloading voices: {done} of {total}",
+    voicesDone: "Done: the voices are now stored on this device.",
+    voicesCancel: "Cancel",
+    voicesNoCache: "This browser cannot store the voices for offline use.",
+    voicesError: "Could not get the voice list. Open the app online (not from a file) and try again.",
+    voicesPartial: "Saved {done} of {total}. Try again to download the rest.",
     noVoice: "This browser has no voice for reading aloud. Try another browser or install a voice."
   }
 };

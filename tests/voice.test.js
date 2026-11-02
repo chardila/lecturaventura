@@ -95,3 +95,15 @@ test("resolve: URL o null", function () {
   assert.equal(Voice.resolve(m, "es", "Otra cosa"), null);
   assert.equal(Voice.resolve(m, "en", "Hola mundo"), null);
 });
+
+test("pendingFor: solo clips del idioma que aún no están guardados", function () {
+  var manifest = { version: 1, clips: {
+    aaa: { lang: "es", bytes: 10 }, bbb: { lang: "es", bytes: 20 },
+    ccc: { lang: "en", bytes: 30 }
+  } };
+  var cached = { "audio/es/aaa.mp3": true };
+  var out = Voice.pendingFor(manifest, "es", function (url) { return !!cached[url]; });
+  assert.deepEqual(out, [{ key: "bbb", bytes: 20 }]);
+  assert.deepEqual(Voice.pendingFor(manifest, "en", function () { return false; }), [{ key: "ccc", bytes: 30 }]);
+  assert.deepEqual(Voice.pendingFor(null, "es", function () { return false; }), []);
+});

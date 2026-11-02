@@ -61,3 +61,7 @@ No sirve / falta: todo es opción múltiple de **comprensión**; no hay fluidez 
 ## Historias largas (hecho 2026-10-27)
 - [x] 6 historias originales (Mili y Nubi, Dani Mala Pata) en es/en, con ajuste por perfil (todas/cortas/largas) y serie que se abre en orden.
 - Pendiente: probar con los niños (largo real, tono, chistes en inglés) y ajustar; más historias si funcionan; práctica en inglés; audio modelo.
+
+## Voces pregeneradas (hecho 2026-11-02)
+- [x] Audios neuronales pregenerados (es-CO Salomé / en) en `audio/`, reproducidos por `speak()` con respaldo a la voz del navegador; descarga para uso sin internet en la zona de padres. Ver README, sección "Voces".
+- Fuera de alcance (ideas futuras): resaltado de palabras mientras suena la voz (ligado al ítem 8), voces distintas por personaje, control de velocidad, grabaciones del padre/madre.

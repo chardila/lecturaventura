@@ -1023,6 +1023,87 @@
     var inp = $("#lock-answer"); if (inp) inp.focus();
   }
 
+  /* ---------- Voces para usar sin internet ---------- */
+  var voiceDl = null;                       // {lang, ctrl} mientras se descarga
+  function profileLangs() {
+    var seen = {}, out = [];
+    store.profiles.forEach(function (p) { if (!seen[p.lang]) { seen[p.lang] = true; out.push(p.lang); } });
+    return out;
+  }
+  function voicesCardHtml() {
+    var langs = profileLangs();
+    if (!langs.length) return "";
+    var h = '<div class="mission" style="flex-direction:column;align-items:stretch"><strong>🔊 ' + t("voicesTitle") + '</strong>';
+    if (!window.caches) return h + '<p class="muted" id="voices-msg" role="status">' + t("voicesNoCache") + '</p></div>';
+    if (voiceDl) {
+      h += '<p class="muted" id="voices-msg" role="status"></p><div class="btn-row">' +
+        '<button class="btn ghost" data-act="voices-cancel">' + t("voicesCancel") + '</button></div>';
+    } else {
+      h += '<div class="btn-row">';
+      langs.forEach(function (l) {
+        h += '<button class="btn ghost" data-act="voices-download" data-lang="' + esc(l) + '">' +
+          t("voicesDownload").replace("{lang}", langLabel(l)) + '</button>';
+      });
+      h += '</div><p class="muted" id="voices-msg" role="status"></p>';
+    }
+    return h + '</div>';
+  }
+  function setVoicesMsg(txt) { var m = $("#voices-msg"); if (m) m.textContent = txt; }
+  function pendingClips(manifest, lang) {                  // Promise<Array<{key,bytes}>>
+    return openVoiceCache().then(function (cache) {
+      if (!cache) return Voice.pendingFor(manifest, lang, function () { return false; });
+      return cache.keys().catch(function () { return []; }).then(function (reqs) {
+        var have = {};
+        reqs.forEach(function (r) { have[r.url] = true; });
+        return Voice.pendingFor(manifest, lang, function (url) { return !!have[new URL(url, location.href).href]; });
+      });
+    });
+  }
+  // Baja de a 3 los clips que faltan; se detiene con signal conservando lo guardado.
+  function downloadVoices(lang, onProgress, signal) {      // Promise<{done,total}>
+    return Promise.all([loadManifest(), openVoiceCache()]).then(function (r) {
+      var manifest = r[0], cache = r[1];
+      if (!manifest) throw new Error("manifest");
+      if (!cache) throw new Error("cache");
+      return pendingClips(manifest, lang).then(function (list) {
+        var total = list.length, done = 0, next = 0;
+        onProgress(0, total);
+        function worker() {
+          if (signal.aborted || next >= total) return Promise.resolve();
+          var url = Voice.clipUrl(lang, list[next++].key);
+          return fetch(url, { signal: signal }).then(function (resp) {
+            if (!resp.ok) throw new Error("clip " + resp.status);
+            return cache.put(url, resp).then(function () { done++; onProgress(done, total); });
+          }).catch(function () {}).then(worker);       // un clip fallido se salta
+        }
+        return Promise.all([worker(), worker(), worker()]).then(function () { return { done: done, total: total }; });
+      });
+    });
+  }
+  function startVoicesDownload(lang) {
+    setVoicesMsg("…");
+    loadManifest().then(function (manifest) {
+      if (!manifest) { setVoicesMsg(t("voicesError")); return null; }
+      return pendingClips(manifest, lang).then(function (list) {
+        if (!list.length) { setVoicesMsg(t("voicesDone")); return null; }
+        var bytes = list.reduce(function (a, c) { return a + c.bytes; }, 0);
+        var mb = (bytes / 1048576).toFixed(1);
+        if (!confirm(t("voicesSize").replace("{mb}", mb))) { setVoicesMsg(""); return null; }
+        var ctrl = new AbortController();
+        voiceDl = { lang: lang, ctrl: ctrl };
+        renderParentsHome();
+        function prog(d, n) { setVoicesMsg(t("voicesProgress").replace("{done}", d).replace("{total}", n)); }
+        return downloadVoices(lang, prog, ctrl.signal).then(function (res) {
+          var wasAborted = ctrl.signal.aborted;
+          voiceDl = null;
+          if (parentUnlocked) renderParentsHome();
+          setVoicesMsg(!wasAborted && res.done === res.total ? t("voicesDone")
+            : t("voicesPartial").replace("{done}", res.done).replace("{total}", res.total));
+        });
+      });
+    }).catch(function () { voiceDl = null; if (parentUnlocked) renderParentsHome(); setVoicesMsg(t("voicesError")); });
+  }
+
   function renderParentsHome() {
     var html = '<div class="center-col" style="padding-top:3vh"><h1>🔓 ' + t("parentZone") + '</h1>' +
       '<p class="muted" style="font-size:.9rem">' + t("storageNote") + '</p>';
@@ -1036,6 +1117,7 @@
         '<button class="btn ghost" data-act="parents-delete" data-id="' + esc(p.id) + '" style="color:var(--c-red)">' + t("deleteProfile") + '</button>' +
         '</div></div>';
     });
+    html += voicesCardHtml();
     html += '<div class="spacer"></div><div class="practice-actions">' +
       (store.profiles.length >= Profiles.MAX_PROFILES
         ? '<p class="muted">' + t("limitReached") + '</p>'
@@ -1105,6 +1187,7 @@
       renderLock(false); show("screen-parents"); return true;
     }
     if (act === "parents-exit") {
+      if (voiceDl) voiceDl.ctrl.abort();
       parentUnlocked = false; parentDraft = null; renderProfiles(); show("screen-profiles"); return true;
     }
     if (act === "lock-submit") {
@@ -1141,6 +1224,8 @@
       if (confirm(t("confirmResetAll"))) { store = Profiles.resetAll(); persistStore(); renderParentsHome(); }
       return true;
     }
+    if (act === "voices-download") { if (!voiceDl) startVoicesDownload(tg.dataset.lang); return true; }
+    if (act === "voices-cancel") { if (voiceDl) voiceDl.ctrl.abort(); return true; }
     if (act === "profile-cancel") { parentDraft = null; renderParentsHome(); return true; }
     if (act === "profile-save") { if (parentDraft) saveProfileDraft(); return true; }
     return false;

@@ -66,6 +66,15 @@ test("clipsFor: sin duplicados, ordenado, con textos, frases y palabras", functi
   });
 });
 
+test("clipsFor: incluye easy.en", function () {
+  var content = loadContent();
+  var clips = Voice.clipsFor(content, Practice);
+  var sec = sections(content).filter(function (s) { return s.easy && s.easy.en; })[0];
+  assert.ok(sec, "hay una sección con easy.en");
+  var k = Voice.key("en", sec.easy.en);
+  assert.ok(clips.some(function (c) { return c.lang === "en" && c.key === k; }));
+});
+
 test("clipUrl", function () {
   assert.equal(Voice.clipUrl("es", "abc"), "audio/es/abc.mp3");
 });

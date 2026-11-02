@@ -42,6 +42,7 @@ var Voice = (function () {
           add("es", text.es);
           add("es", easy.es);
           add("en", text.en);
+          add("en", easy.en);
           if (typeof text.es !== "string") return;
           practice.splitSentences(text.es).forEach(function (sentence) {
             add("es", sentence);

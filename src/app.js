@@ -1301,6 +1301,7 @@
   var SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
   document.addEventListener("pointerdown", function () {
     try {
+      if (!voiceEl.paused || voiceEl.src) return;     // ya suena (o sonó) un clip real: no pisarlo
       voiceEl.src = SILENT_WAV;
       var p = voiceEl.play();
       if (p && p.then) p.then(function () { if (voiceEl.src === SILENT_WAV) voiceEl.pause(); }, function () {});
@@ -1312,13 +1313,32 @@
     try { voiceEl.pause(); } catch (e) {}
     if (window.speechSynthesis) { try { window.speechSynthesis.cancel(); } catch (e) {} }
   }
+  function openVoiceCache() {                      // Promise<Cache|null>; nunca rechaza
+    if (!window.caches) return Promise.resolve(null);
+    try { return window.caches.open("voces-v1").catch(function () { return null; }); }
+    catch (e) { return Promise.resolve(null); }
+  }
+  // Manifiesto: red primero y copia en el caché; sin red se usa la copia. Si el resultado es null no se
+  // recuerda (el siguiente speak() lo reintenta).
   function loadManifest() {
     if (!manifestPromise) {
-      if (location.protocol === "file:") manifestPromise = Promise.resolve(null);   // el navegador bloquea fetch en file://
-      else manifestPromise = fetch("audio/manifest.json").then(function (r) {
-        if (!r.ok) throw new Error("manifest " + r.status);
-        return r.json();
-      }).catch(function () { return null; });
+      var mine;
+      if (location.protocol === "file:") mine = Promise.resolve(null);   // el navegador bloquea fetch en file://
+      else {
+        var murl = new URL("audio/manifest.json", location.href).href;
+        mine = openVoiceCache().then(function (cache) {
+          return fetch(murl).then(function (r) {
+            if (!r.ok) throw new Error("manifest " + r.status);
+            if (cache) { try { cache.put(murl, r.clone()).catch(function () {}); } catch (e) {} }
+            return r.json();
+          }).catch(function () {
+            if (!cache) return null;
+            return cache.match(murl).then(function (hit) { return hit ? hit.json() : null; }).catch(function () { return null; });
+          });
+        }).catch(function () { return null; });
+      }
+      manifestPromise = mine;
+      mine.then(function (m) { if (!m && manifestPromise === mine) manifestPromise = null; });
     }
     return manifestPromise;
   }
@@ -1326,23 +1346,18 @@
     return resp.blob().then(function (b) { return URL.createObjectURL(b); });
   }
   function fetchClip(url) {
-    function plain() {
-      return fetch(url).then(function (r) {
-        if (!r.ok) throw new Error("clip " + r.status);
-        return blobUrlOf(r);
-      });
-    }
-    if (!window.caches) return plain();
-    return window.caches.open("voces-v1").then(function (cache) {
-      return cache.match(url).then(function (hit) {
+    return openVoiceCache().then(function (cache) {
+      var cached = cache ? cache.match(url).catch(function () { return null; }) : Promise.resolve(null);
+      return cached.then(function (hit) {
         if (hit) return blobUrlOf(hit);
         return fetch(url).then(function (r) {
           if (!r.ok) throw new Error("clip " + r.status);
+          if (!cache) return blobUrlOf(r);
           var copy = r.clone();
           return cache.put(url, copy).catch(function () {}).then(function () { return blobUrlOf(r); });
         });
       });
-    }).catch(function () { return plain(); });
+    });
   }
   function speak(text) {
     stopSpeech();

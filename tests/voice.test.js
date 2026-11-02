@@ -107,3 +107,22 @@ test("pendingFor: solo clips del idioma que aún no están guardados", function 
   assert.deepEqual(Voice.pendingFor(manifest, "en", function () { return false; }), [{ key: "ccc", bytes: 30 }]);
   assert.deepEqual(Voice.pendingFor(null, "es", function () { return false; }), []);
 });
+
+test("clipsFor: incluye las palabras de vocabulario (es y en)", function () {
+  var content = loadContent();
+  var clips = Voice.clipsFor(content, Practice);
+  var n = 0;
+  sections(content).forEach(function (sec) {
+    (sec.tasks || []).forEach(function (task) {
+      if (task.type !== "vocab") return;
+      ["es", "en"].forEach(function (lang) {
+        var w = task.word && task.word[lang];
+        if (!w) return;
+        n++;
+        var k = Voice.key(lang, w);
+        assert.ok(clips.some(function (c) { return c.lang === lang && c.key === k; }), lang + ": " + w);
+      });
+    });
+  });
+  assert.ok(n > 0);
+});

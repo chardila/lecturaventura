@@ -43,6 +43,9 @@ var Voice = (function () {
           add("es", easy.es);
           add("en", text.en);
           add("en", easy.en);
+          (sec.tasks || []).forEach(function (task) {          // "Leer en voz alta" del vocabulario
+            if (task && task.type === "vocab" && task.word) { add("es", task.word.es); add("en", task.word.en); }
+          });
           if (typeof text.es !== "string") return;
           practice.splitSentences(text.es).forEach(function (sentence) {
             add("es", sentence);

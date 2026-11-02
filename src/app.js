@@ -1037,7 +1037,7 @@
     if (!window.caches) return h + '<p class="muted" id="voices-msg" role="status">' + t("voicesNoCache") + '</p></div>';
     if (voiceDl) {
       h += '<p class="muted" id="voices-msg" role="status"></p>' +
-        '<div class="bar"><span id="voices-bar"></span></div><div class="btn-row">' +
+        '<div class="bar" style="flex:none"><span id="voices-bar"></span></div><div class="btn-row">' +
         '<button class="btn ghost" data-act="voices-cancel">' + t("voicesCancel") + '</button></div>';
     } else {
       h += '<div class="btn-row">';
@@ -1394,15 +1394,22 @@
   var voiceEl = new Audio();
   var speakId = 0, voiceBlobUrl = null, manifestPromise = null;
   var SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
-  document.addEventListener("pointerdown", function () {
+  // Sigue armado (pointerdown, touchend y click) hasta que el play() silencioso funcione de verdad.
+  var unlockEvents = ["pointerdown", "touchend", "click"], unlockBusy = false;
+  function disarmUnlock() { unlockEvents.forEach(function (ev) { document.removeEventListener(ev, tryUnlock, true); }); }
+  function tryUnlock() {
+    if (unlockBusy) return;
     try {
-      if (!voiceEl.paused || voiceEl.src) return;     // ya suena (o sonó) un clip real: no pisarlo
+      if (!voiceEl.paused || (voiceEl.src && voiceEl.src !== SILENT_WAV)) { disarmUnlock(); return; }   // ya suena un clip real: no pisarlo
+      unlockBusy = true;
       voiceEl.src = SILENT_WAV;
       var p = voiceEl.play();
-      if (p && p.then) p.then(function () { if (voiceEl.src === SILENT_WAV) voiceEl.pause(); }, function () {});
-      else if (voiceEl.src === SILENT_WAV) voiceEl.pause();
-    } catch (e) {}
-  }, { once: true });
+      if (p && p.then) p.then(function () { unlockBusy = false; disarmUnlock(); if (voiceEl.src === SILENT_WAV) voiceEl.pause(); },
+        function () { unlockBusy = false; });
+      else { unlockBusy = false; disarmUnlock(); if (voiceEl.src === SILENT_WAV) voiceEl.pause(); }
+    } catch (e) { unlockBusy = false; }
+  }
+  unlockEvents.forEach(function (ev) { document.addEventListener(ev, tryUnlock, true); });
   function stopSpeech() {
     speakId++;
     try { voiceEl.pause(); } catch (e) {}

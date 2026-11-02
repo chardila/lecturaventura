@@ -24,7 +24,7 @@ Cálculo aproximado: 57 000 caracteres de secciones (es + en). Con frases y pala
 ## Archivos
 - `audio/es/<clave>.mp3`, `audio/en/<clave>.mp3`
 - `audio/manifest.json`: `{ version, clips: { "<clave>": { lang, bytes } } }`. La app lo lee para saber qué existe sin pedir cada archivo.
-- `tools/generar-voces.mjs`: recorre el contenido, calcula claves, y llama al CLI `edge-tts` solo para las que faltan. Opción `--dry-run` que cuenta caracteres y MB estimados. El motor queda aislado en una función para cambiarlo por Azure si hiciera falta.
+- `tools/generar-voces.js`: recorre el contenido, calcula claves, y llama al CLI `edge-tts` solo para las que faltan. Opción `--dry-run` que cuenta caracteres y MB estimados. El motor queda aislado en una función para cambiarlo por Azure si hiciera falta.
 - Los audios se versionan en git y viajan al sitio con el flujo de Pages actual (`path: .`). `index.html` sigue siendo un solo archivo; los audios van aparte.
 
 ## Reproducción (`speak()`)

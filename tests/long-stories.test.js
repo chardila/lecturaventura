@@ -73,7 +73,8 @@ test("cada sección tiene 1 o 2 tareas de opción múltiple válidas", function 
             assert.ok(t.options[l].length >= 4 && t.options[l].length <= 6, where);
           });
           assert.equal(t.options.es.length, t.options.en.length, where);
-          assert.ok(Number.isInteger(t.answer) && t.answer >= 0 && t.answer < t.options.es.length, where);
+          if (t.type === "predict") assert.equal(t.answer, -1, where);
+          else assert.ok(Number.isInteger(t.answer) && t.answer >= 0 && t.answer < t.options.es.length, where);
           if (t.type === "vocab") {
             LANGS.forEach(function (l) {
               assert.ok(sec.text[l].toLowerCase().indexOf(t.word[l].toLowerCase()) >= 0, where + " vocab " + t.word[l]);
@@ -146,4 +147,15 @@ test("cada mundo tiene insignia en es y en (Libro del tesoro y fin de historia)"
     var b = r.BADGES[w.id];
     assert.ok(b && b.emoji && b.es && b.en, "falta insignia para " + w.id);
   });
+});
+
+test("regresión: en dani-2 la pregunta de sílabas apunta a Hám-ster y Ham-ster", function () {
+  var dani2 = world("dani").stories.filter(function (s) { return s.id === "dani-2"; })[0];
+  var syl = null;
+  dani2.sections.forEach(function (sec) {
+    sec.tasks.forEach(function (t) { if (t.type === "syllable") syl = t; });
+  });
+  assert.ok(syl);
+  assert.equal(syl.options.es[syl.answer], "Hám-ster");
+  assert.equal(syl.options.en[syl.answer], "Ham-ster");
 });

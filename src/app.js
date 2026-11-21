@@ -413,6 +413,15 @@
   }
 
   /* ---------- Aufgaben rendern (Multiple Choice 4–6) ---------- */
+  function taskViewFor(task) {
+    var key = session.si + ":" + session.ti + ":" + (state.lang || "es");
+    if (!session.taskView || session.taskView.key !== key) {
+      var sh = Tasks.shuffleOptions(loc(task.options), task.answer);
+      session.taskView = { key: key, options: sh.options, answer: sh.answer };
+    }
+    return session.taskView;
+  }
+
   function renderTask() {
     var sec = session.story.sections[session.si];
     var tasks = sec.tasks || [];
@@ -436,7 +445,8 @@
       intro + '<h2>' + loc(task.q) + '</h2>';
     if (showHintNow) html += '<p class="muted">\uD83D\uDCA1 ' + loc(task.hint) + '</p>';
 
-    var opts = loc(task.options);
+    var view = taskViewFor(task);
+    var opts = view.options;
     var two = opts.every(function (o) { return String(o).length <= 14; }) && opts.length >= 4;
     html += '<div class="mc-list' + (two ? " two" : "") + '">';
     var keys = "ABCDEF";
@@ -534,12 +544,13 @@
   function answer(optIndex) {
     var sec = session.story.sections[session.si];
     var task = sec.tasks[session.ti];
+    var view = taskViewFor(task);
     var buttons = document.querySelectorAll(".mc");
     for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
 
     // "predict" hat answer:-1 => jede Antwort ist gültig (Vermutung zählt immer)
-    var isOpen = task.answer < 0;
-    var correct = isOpen || optIndex === task.answer;
+    var isOpen = view.answer < 0;
+    var correct = isOpen || optIndex === view.answer;
     session.answered++;
     var cat = taskCategory(task.type);
     if (state.stats.byType && state.stats.byType[cat]) { state.stats.byType[cat].n++; if (correct) state.stats.byType[cat].c++; }
@@ -557,7 +568,7 @@
       maybeSurprise();
     } else {
       buttons[optIndex].classList.add("wrong");
-      if (buttons[task.answer]) buttons[task.answer].classList.add("correct");
+      if (buttons[view.answer]) buttons[view.answer].classList.add("correct");
       session.adapt = Math.max(-2, session.adapt - 1);  // adaptiv: leichter + Hilfe
       fb.className = "feedback no show";
       fb.innerHTML = t("wrong") + (task.hint ? "<br>\uD83D\uDCA1 " + loc(task.hint) : "") + "<br>" + t("showAnswer");
@@ -1617,6 +1628,6 @@
 
   // Fuer Tests / Konsole zugaenglich machen
   window.LeseAbenteuer = { state: function () { return state; }, CONTENT: CONTENT, estimateStoryMinutes: estimateStoryMinutes, sectionSeconds: sectionSeconds,
-    Recognizer: Recognizer, Practice: Practice, Profiles: Profiles, store: function () { return store; },
+    Recognizer: Recognizer, Practice: Practice, Profiles: Profiles, Tasks: Tasks, store: function () { return store; },
     enterProfile: enterProfile, leaveProfile: leaveProfile, session: function () { return session; }, startPractice: startPractice, parentSheet: parentSheet };
 })();

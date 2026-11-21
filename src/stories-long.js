@@ -67,7 +67,7 @@
             { es: ["Porque está nerviosa", "Porque tiene sed", "Porque quiere jugar", "Porque hace calor"], en: ["Because it is nervous", "Because it is thirsty", "Because it wants to play", "Because it is hot"] }, 0),
           task("predict",
             { es: "¿Qué crees que pasará cuando Mili cante?", en: "What do you think will happen when Millie sings?" },
-            { es: ["Nubi se calmará", "Nubi se irá volando", "Nubi lloverá más", "Nubi se dormirá"], en: ["Puff will calm down", "Puff will fly away", "Puff will rain more", "Puff will fall asleep"] }, 0)
+            { es: ["Nubi se calmará", "Nubi se irá volando", "Nubi lloverá más", "Nubi se dormirá"], en: ["Puff will calm down", "Puff will fly away", "Puff will rain more", "Puff will fall asleep"] }, -1)
         ]
       },
       {
@@ -123,7 +123,7 @@
             { es: ["Un lápiz, un borrador y un globo", "Una pelota, un libro y una silla", "Un gato, un perro y un pájaro", "Una flor, un árbol y una casa"], en: ["A pencil, an eraser and a balloon", "A ball, a book and a chair", "A cat, a dog and a bird", "A flower, a tree and a house"] }, 0),
           task("predict",
             { es: "¿Qué crees que hará la profe Luz?", en: "What do you think Miss Lucy will do?" },
-            { es: ["Mirará a Nubi con sorpresa", "Se irá corriendo", "Apagará las luces", "Pondrá una tarea enorme"], en: ["She will look at Puff in surprise", "She will run away", "She will turn off the lights", "She will give a huge homework"] }, 0)
+            { es: ["Mirará a Nubi con sorpresa", "Se irá corriendo", "Apagará las luces", "Pondrá una tarea enorme"], en: ["She will look at Puff in surprise", "She will run away", "She will turn off the lights", "She will give a huge homework"] }, -1)
         ]
       },
       {
@@ -179,7 +179,7 @@
             { es: ["Copitos de nieve de colores", "Gotas de lluvia", "Hojas secas", "Migas de pan"], en: ["Colorful snowflakes", "Raindrops", "Dry leaves", "Bread crumbs"] }, 0),
           task("predict",
             { es: "¿Qué crees que hará Tomás con la nieve?", en: "What do you think Tommy will do with the snow?" },
-            { es: ["Pedirá un deseo", "Se pondrá a llorar", "Llamará a su mamá", "Guardará la nieve en el bolsillo"], en: ["He will make a wish", "He will start to cry", "He will call his mom", "He will keep the snow in his pocket"] }, 0)
+            { es: ["Pedirá un deseo", "Se pondrá a llorar", "Llamará a su mamá", "Guardará la nieve en el bolsillo"], en: ["He will make a wish", "He will start to cry", "He will call his mom", "He will keep the snow in his pocket"] }, -1)
         ]
       },
       {
@@ -237,7 +237,7 @@
             { es: ["Se la come", "Se la regala a Lola", "Se le pierde en el parque", "Se la lleva el viento"], en: ["He eats it", "He gives it to Lola", "He loses it in the park", "The wind takes it"] }, 0),
           task("predict",
             { es: "¿Qué crees que pasará el viernes en el concurso?", en: "What do you think will happen on Friday at the show?" },
-            { es: ["Algo saldrá mal, pero será divertido", "Todo saldrá perfecto sin ningún error", "El concurso se cancelará", "Dani se quedará dormido"], en: ["Something will go wrong, but it will be funny", "Everything will be perfect with no mistakes", "The show will be canceled", "Danny will fall asleep"] }, 0)
+            { es: ["Algo saldrá mal, pero será divertido", "Todo saldrá perfecto sin ningún error", "El concurso se cancelará", "Dani se quedará dormido"], en: ["Something will go wrong, but it will be funny", "Everything will be perfect with no mistakes", "The show will be canceled", "Danny will fall asleep"] }, -1)
         ]
       },
       {
@@ -333,7 +333,7 @@
             { es: ["Porque la puerta no estaba bien cerrada", "Porque Lola abrió la jaula", "Porque Croqueta la rompió", "Porque la jaula era muy pequeña"], en: ["Because the door was not closed tight", "Because Lola opened the cage", "Because Crouton broke it", "Because the cage was too small"] }, 0),
           task("predict",
             { es: "¿Qué crees que harán Dani y Lola ahora?", en: "What do you think Danny and Lola will do now?" },
-            { es: ["Buscar a Bigotes por toda la casa", "Dormir otra vez", "Salir a jugar al parque", "Comer panqueques"], en: ["Look for Whiskers all over the house", "Go back to sleep", "Go play at the park", "Eat pancakes"] }, 0)
+            { es: ["Buscar a Bigotes por toda la casa", "Dormir otra vez", "Salir a jugar al parque", "Comer panqueques"], en: ["Look for Whiskers all over the house", "Go back to sleep", "Go play at the park", "Eat pancakes"] }, -1)
         ]
       },
       {
@@ -362,7 +362,7 @@
             { es: ["Del sombrero de copa de papá", "De la nevera", "De debajo de la cama", "De la tostadora"], en: ["From Dad's top hat", "From the fridge", "From under the bed", "From the toaster"] }, 0),
           task("predict",
             { es: "¿Qué crees que hay dentro del sombrero?", en: "What do you think is inside the hat?" },
-            { es: ["Bigotes", "Un conejo de verdad", "Un calcetín viejo", "Nada"], en: ["Whiskers", "A real rabbit", "An old sock", "Nothing"] }, 0)
+            { es: ["Bigotes", "Un conejo de verdad", "Un calcetín viejo", "Nada"], en: ["Whiskers", "A real rabbit", "An old sock", "Nothing"] }, -1)
         ]
       },
       {
@@ -376,7 +376,7 @@
             { es: ["Durmiendo dentro del sombrero de copa", "Escondido en la tostadora", "Debajo de la cama de Lola", "En el jardín"], en: ["Sleeping inside the top hat", "Hidden in the toaster", "Under Lola's bed", "In the yard"] }, 0),
           task("syllable",
             { es: "Junta las sílabas de forma correcta.", en: "Put the syllables together correctly." },
-            { es: ["Há-ms-ter", "Hám-s-ter", "Hám-ster", "Ham-ster-á"], en: ["Ham-ster", "Hams-ter", "Ha-mster", "Hamst-er"] }, 2)
+            { es: ["Há-ms-ter", "Hám-s-ter", "Hám-ster", "Ham-ster-á"], en: ["Ha-mster", "Hams-ter", "Ham-ster", "Hamst-er"] }, 2)
         ]
       },
       {
@@ -432,7 +432,7 @@
             { es: ["Un dinosaurio dormido", "Un barco grande", "Una montaña", "Un globo de colores"], en: ["A sleeping dinosaur", "A big boat", "A mountain", "A colorful balloon"] }, 0),
           task("predict",
             { es: "¿Qué crees que pasará cuando oscurezca?", en: "What do you think will happen when it gets dark?" },
-            { es: ["Se oirán ruidos misteriosos", "Aparecerán dinosaurios de verdad", "Se acabará la noche enseguida", "Nadie podrá dormir por el calor"], en: ["They will hear mysterious sounds", "Real dinosaurs will show up", "The night will end right away", "Nobody will sleep because of the heat"] }, 0)
+            { es: ["Se oirán ruidos misteriosos", "Aparecerán dinosaurios de verdad", "Se acabará la noche enseguida", "Nadie podrá dormir por el calor"], en: ["They will hear mysterious sounds", "Real dinosaurs will show up", "The night will end right away", "Nobody will sleep because of the heat"] }, -1)
         ]
       },
       {
@@ -475,7 +475,7 @@
             { es: ["El rociador del vecino", "Una nube de verdad", "Una manguera de Dani", "La lluvia de la tarde"], en: ["The neighbor's sprinkler", "A real cloud", "Danny's hose", "The afternoon rain"] }, 0),
           task("predict",
             { es: "¿Qué crees que hará mamá cuando los vea?", en: "What do you think Mom will do when she sees them?" },
-            { es: ["Los invitará a entrar a la casa", "Los dejará mojados toda la noche", "Se enojará muchísimo", "Llamará a los bomberos"], en: ["She will invite them inside the house", "She will leave them wet all night", "She will get very angry", "She will call the firefighters"] }, 0)
+            { es: ["Los invitará a entrar a la casa", "Los dejará mojados toda la noche", "Se enojará muchísimo", "Llamará a los bomberos"], en: ["She will invite them inside the house", "She will leave them wet all night", "She will get very angry", "She will call the firefighters"] }, -1)
         ]
       },
       {
